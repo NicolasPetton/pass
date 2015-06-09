@@ -111,12 +111,10 @@
 (defun password-store-mode-kill ()
   "Remove the entry at point."
   (interactive)
-  (let ((entry (password-store-mode-closest-entry)))
-    (if entry
-        (when (yes-or-no-p (format "Do you want remove the entry %s? " entry))
-          (password-store-remove entry)
-          (password-store-mode-update-buffer))
-      (message "Nothing to remove"))))
+  (with-closest-entry entry
+    (when (yes-or-no-p (format "Do you want remove the entry %s? " entry))
+      (password-store-remove entry)
+      (password-store-mode-update-buffer))))
 
 (defun password-store-mode-update-buffer ()
   "Update the current buffer contents."
@@ -139,17 +137,21 @@ instead of reading the password from user input."
 (defun password-store-mode-view ()
   "Visit the entry at point."
   (interactive)
-  (let ((entry (password-store-mode-closest-entry)))
-    (if entry
-        (password-store-edit entry)
-      (message "No entry at point"))))
+  (with-closest-entry entry
+    (password-store-edit entry)))
+
+(defun password-store-mode-copy ()
+  "Visit the entry at point."
+  (interactive)
+  (with-closest-entry entry
+    (password-store-copy entry)))
 
 (defun password-store-mode-display-data ()
   "Display the password-store data into the current buffer."
-  (let ((entrys (sort (password-store-mode--get-entries)
-                      #'string-lessp)))
+  (let ((entries (sort (password-store-mode--get-entries)
+                       #'string-lessp)))
     (password-store-mode-display-header)
-    (dolist (entry entrys)
+    (dolist (entry entries)
       (password-store-mode-display-entry entry))))
 
 (defun password-store-mode-display-header ()
@@ -201,6 +203,13 @@ instead of reading the password from user input."
        ,@body
        (when ,read-only
          (read-only-mode 1)))))
+
+(defmacro with-closest-entry (varname &rest body)
+  (declare (indent 1) (debug t))
+  `(let ((,varname (password-store-mode-closest-entry)))
+     (if ,varname
+         ,@body
+       (message "No entry at point"))))
 
 (defmacro save-point (&rest body)
   "Evaluate BODY and restore the point.
