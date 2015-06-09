@@ -58,16 +58,18 @@
   "Face for displaying password-store-mode field names.")
 
 (defface password-store-mode-entry-face '((t . (:inherit
-                                   font-lock-function-name-face
-                                   :weight
-                                   bold)))
+                                                font-lock-function-name-face
+                                                :weight
+                                                bold)))
   "Face for displaying password-store entry names.")
 
 (defface password-store-mode-password-face '((t . (:inherit widget-field)))
   "Face for displaying password-store entrys names.")
 
 (defun password-store-mode ()
-  "Major mode for editing password-stores."
+  "Major mode for editing password-stores.
+
+\\{password-store-mode-map}"
   (interactive)
   (kill-all-local-variables)
   (setq major-mode 'password-store-mode
