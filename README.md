@@ -15,6 +15,8 @@ The following keybindings are available:
 - `i`: Insert a new entry (With a prefix argument, generate the password)
 - `n`: Go to the next entry
 - `p`: Go to the previous entry
+- `M-n`: Go to the next directory
+- `M-p`: Go to the previous directory
 - `k`: Remove the entry at point
 - `s`: Trigger iSearch
 - `r`: Trigger iSearch (backward)
