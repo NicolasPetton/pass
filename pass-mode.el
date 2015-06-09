@@ -1,4 +1,4 @@
-;;; password-store-mode.el --- Major mode for password-store.el
+;;; pass-mode.el --- Major mode for password-store.el
 
 ;; Copyright (C) 2015  Nicolas Petton
 
@@ -29,103 +29,103 @@
 ;;; Code:
 (require 'password-store)
 
-(defvar password-store-mode-buffer-name "*Password-Store*"
-  "Name of the password-store-mode buffer.")
+(defvar pass-mode-buffer-name "*Password-Store*"
+  "Name of the pass-mode buffer.")
 
-(defvar password-store-mode-hook nil
-  "Mode hook for `password-store-mode'.")
+(defvar pass-mode-hook nil
+  "Mode hook for `pass-mode'.")
 
-(defvar password-store-mode-map
+(defvar pass-mode-map
   (let ((map (make-sparse-keymap)))
-    (define-key map (kbd "n") #'password-store-mode-next-entry)
-    (define-key map (kbd "p") #'password-store-mode-prev-entry)
-    (define-key map (kbd "k") #'password-store-mode-kill)
+    (define-key map (kbd "n") #'pass-mode-next-entry)
+    (define-key map (kbd "p") #'pass-mode-prev-entry)
+    (define-key map (kbd "k") #'pass-mode-kill)
     (define-key map (kbd "s") #'isearch-forward)
     (define-key map (kbd "r") #'isearch-backward)
     (define-key map (kbd "?") #'describe-mode)
-    (define-key map (kbd "g") #'password-store-mode-update-buffer)
-    (define-key map (kbd "i") #'password-store-mode-insert)
-    (define-key map (kbd "w") #'password-store-mode-copy)
-    (define-key map (kbd "v") #'password-store-mode-view)
-    (define-key map (kbd "RET") #'password-store-mode-view)
-    (define-key map (kbd "q") #'password-store-mode-quit)
+    (define-key map (kbd "g") #'pass-mode-update-buffer)
+    (define-key map (kbd "i") #'pass-mode-insert)
+    (define-key map (kbd "w") #'pass-mode-copy)
+    (define-key map (kbd "v") #'pass-mode-view)
+    (define-key map (kbd "RET") #'pass-mode-view)
+    (define-key map (kbd "q") #'pass-mode-quit)
     map)
-  "Keymap for `password-store-mode'.")
+  "Keymap for `pass-mode'.")
 
-(defface password-store-mode-header-face '((t . (:inherit font-lock-keyword-face)))
-  "Face for displaying the header of the password-store-mode buffer.")
+(defface pass-mode-header-face '((t . (:inherit font-lock-keyword-face)))
+  "Face for displaying the header of the pass-mode buffer.")
 
-(defface password-store-mode-directory-face '((t . ()))
-  "Face for displaying password-store-mode field names.")
+(defface pass-mode-directory-face '((t . ()))
+  "Face for displaying pass-mode field names.")
 
-(defface password-store-mode-entry-face '((t . (:inherit
+(defface pass-mode-entry-face '((t . (:inherit
                                                 font-lock-function-name-face
                                                 :weight
                                                 bold)))
   "Face for displaying password-store entry names.")
 
-(defface password-store-mode-password-face '((t . (:inherit widget-field)))
+(defface pass-mode-password-face '((t . (:inherit widget-field)))
   "Face for displaying password-store entrys names.")
 
-(defun password-store-mode ()
+(defun pass-mode ()
   "Major mode for editing password-stores.
 
-\\{password-store-mode-map}"
+\\{pass-mode-map}"
   (interactive)
   (kill-all-local-variables)
-  (setq major-mode 'password-store-mode
+  (setq major-mode 'pass-mode
         mode-name 'Password-Store)
   (read-only-mode)
-  (use-local-map password-store-mode-map)
-  (run-hooks 'password-store-mode-hook))
+  (use-local-map pass-mode-map)
+  (run-hooks 'pass-mode-hook))
 
-(defun password-store-mode-setup-buffer ()
+(defun pass-mode-setup-buffer ()
   "Setup the password-store buffer."
-  (password-store-mode)
-  (password-store-mode-update-buffer))
+  (pass-mode)
+  (pass-mode-update-buffer))
 
-(defun password-store ()
+(defun pass ()
   "Open the password-store buffer."
   (interactive)
-  (if (get-buffer password-store-mode-buffer-name)
-      (switch-to-buffer password-store-mode-buffer-name)
+  (if (get-buffer pass-mode-buffer-name)
+      (switch-to-buffer pass-mode-buffer-name)
     (progn
-      (let ((buf (get-buffer-create password-store-mode-buffer-name)))
+      (let ((buf (get-buffer-create pass-mode-buffer-name)))
         (pop-to-buffer buf)
-        (password-store-mode-setup-buffer)))))
+        (pass-mode-setup-buffer)))))
 
-(defun password-store-mode-quit ()
-  "Kill the buffer quitting the window and forget the password-store-mode."
+(defun pass-mode-quit ()
+  "Kill the buffer quitting the window and forget the pass-mode."
   (interactive)
   (quit-window t))
 
-(defun password-store-mode-next-entry ()
+(defun pass-mode-next-entry ()
   "Move point to the next entry found."
   (interactive)
-  (password-store-mode--goto-next #'password-store-mode-entry-at-point))
+  (pass-mode--goto-next #'pass-mode-entry-at-point))
 
-(defun password-store-mode-prev-entry ()
+(defun pass-mode-prev-entry ()
   "Move point to the previous entry."
   (interactive)
-  (password-store-mode--goto-prev #'password-store-mode-entry-at-point))
+  (pass-mode--goto-prev #'pass-mode-entry-at-point))
 
-(defun password-store-mode-kill ()
+(defun pass-mode-kill ()
   "Remove the entry at point."
   (interactive)
-  (with-closest-entry entry
+  (pass-mode--with-closest-entry entry
     (when (yes-or-no-p (format "Do you want remove the entry %s? " entry))
       (password-store-remove entry)
-      (password-store-mode-update-buffer))))
+      (pass-mode-update-buffer))))
 
-(defun password-store-mode-update-buffer ()
+(defun pass-mode-update-buffer ()
   "Update the current buffer contents."
   (interactive)
-  (save-point
-    (with-writable-buffer
+  (pass-mode--save-point
+    (pass-mode--with-writable-buffer
       (delete-region (point-min) (point-max))
-      (password-store-mode-display-data))))
+      (pass-mode-display-data))))
 
-(defun password-store-mode-insert (&optional arg)
+(defun pass-mode-insert (&optional arg)
   "Insert an entry to the password-store.
 When called with a prefix argument ARG, use a generated password
 instead of reading the password from user input."
@@ -133,69 +133,69 @@ instead of reading the password from user input."
   (if arg
       (call-interactively #'password-store-generate)
     (call-interactively #'password-store-insert))
-  (password-store-mode-update-buffer))
+  (pass-mode-update-buffer))
 
-(defun password-store-mode-view ()
+(defun pass-mode-view ()
   "Visit the entry at point."
   (interactive)
-  (with-closest-entry entry
+  (pass-mode--with-closest-entry entry
     (password-store-edit entry)))
 
-(defun password-store-mode-copy ()
+(defun pass-mode-copy ()
   "Visit the entry at point."
   (interactive)
-  (with-closest-entry entry
+  (pass-mode--with-closest-entry entry
     (password-store-copy entry)))
 
-(defun password-store-mode-display-data ()
+(defun pass-mode-display-data ()
   "Display the password-store data into the current buffer."
-  (let ((entries (sort (password-store-mode--get-entries)
+  (let ((entries (sort (pass-mode--get-entries)
                        #'string-lessp)))
-    (password-store-mode-display-header)
+    (pass-mode-display-header)
     (dolist (entry entries)
-      (password-store-mode-display-entry entry))))
+      (pass-mode-display-entry entry))))
 
-(defun password-store-mode-display-header ()
+(defun pass-mode-display-header ()
   "Display the header intothe current buffer."
   (insert "Password-store contents:")
-  (put-text-property (point-at-bol) (point) 'face 'password-store-mode-header-face)
+  (put-text-property (point-at-bol) (point) 'face 'pass-mode-header-face)
   (insert " ")
   (newline)
   (newline))
 
-(defun password-store-mode-display-entry (entry)
+(defun pass-mode-display-entry (entry)
   "Display the entry ENTRY and the associated data into the current buffer."
   (insert entry)
   (add-text-properties (point-at-bol) (point)
-                       `(face password-store-mode-entry-face password-store-mode-entry ,entry))
+                       `(face pass-mode-entry-face pass-mode-entry ,entry))
   (newline))
 
-(defun password-store-mode-entry-at-point ()
-  "Return the `password-store-mode-entry' property at point."
-  (get-text-property (point) 'password-store-mode-entry))
+(defun pass-mode-entry-at-point ()
+  "Return the `pass-mode-entry' property at point."
+  (get-text-property (point) 'pass-mode-entry))
 
-(defun password-store-mode-closest-entry ()
+(defun pass-mode-closest-entry ()
   "Return the closest entry in the current buffer, looking backward."
   (save-excursion
     (unless (bobp)
-      (or (password-store-mode-entry-at-point)
+      (or (pass-mode-entry-at-point)
           (progn
             (previous-line)
-            (password-store-mode-closest-entry))))))
+            (pass-mode-closest-entry))))))
 
-(defun password-store-mode--goto-next (pred)
+(defun pass-mode--goto-next (pred)
   "Move point to the next match of PRED."
   (next-line)
   (while (not (or (eobp) (funcall pred)))
     (next-line)))
 
-(defun password-store-mode--goto-prev (pred)
+(defun pass-mode--goto-prev (pred)
   "Move point to the previous match of PRED."
   (previous-line)
   (while (not (or (bobp) (funcall pred)))
     (previous-line)))
 
-(defmacro with-writable-buffer (&rest body)
+(defmacro pass-mode--with-writable-buffer (&rest body)
   "Evaluate BODY with the current buffer not in `read-only-mode'."
   (declare (indent 0) (debug t))
   (let ((read-only (make-symbol "ro")))
@@ -205,14 +205,14 @@ instead of reading the password from user input."
        (when ,read-only
          (read-only-mode 1)))))
 
-(defmacro with-closest-entry (varname &rest body)
+(defmacro pass-mode--with-closest-entry (varname &rest body)
   (declare (indent 1) (debug t))
-  `(let ((,varname (password-store-mode-closest-entry)))
+  `(let ((,varname (pass-mode-closest-entry)))
      (if ,varname
          ,@body
        (message "No entry at point"))))
 
-(defmacro save-point (&rest body)
+(defmacro pass-mode--save-point (&rest body)
   "Evaluate BODY and restore the point.
 Similar to `save-excursion' but only restore the point."
   (declare (indent 0) (debug t))
@@ -221,8 +221,8 @@ Similar to `save-excursion' but only restore the point."
        ,@body
        (goto-char (min ,point (point-max))))))
 
-(defun password-store-mode--get-entries ()
+(defun pass-mode--get-entries ()
   (password-store-list))
 
-(provide 'password-store-mode)
-;;; password-store-mode.el ends here
+(provide 'pass-mode)
+;;; pass-mode.el ends here
