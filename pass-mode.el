@@ -22,12 +22,9 @@
 
 ;; Major mode for password-store.el
 
-;; TODO:
-;; - get a tree structure of entries, not a flat list
-;; - add navigation to the next/previous folder with M-n and M-p
-
 ;;; Code:
 (require 'password-store)
+(require 'f)
 
 (defvar pass-mode-buffer-name "*Password-Store*"
   "Name of the pass-mode buffer.")
@@ -39,6 +36,8 @@
   (let ((map (make-sparse-keymap)))
     (define-key map (kbd "n") #'pass-mode-next-entry)
     (define-key map (kbd "p") #'pass-mode-prev-entry)
+    (define-key map (kbd "M-n") #'pass-mode-next-directory)
+    (define-key map (kbd "M-p") #'pass-mode-prev-directory)
     (define-key map (kbd "k") #'pass-mode-kill)
     (define-key map (kbd "s") #'isearch-forward)
     (define-key map (kbd "r") #'isearch-backward)
@@ -55,14 +54,14 @@
 (defface pass-mode-header-face '((t . (:inherit font-lock-keyword-face)))
   "Face for displaying the header of the pass-mode buffer.")
 
-(defface pass-mode-directory-face '((t . ()))
-  "Face for displaying pass-mode field names.")
+(defface pass-mode-entry-face '((t . ()))
+  "Face for displaying pass-mode entry names.")
 
-(defface pass-mode-entry-face '((t . (:inherit
+(defface pass-mode-directory-face '((t . (:inherit
                                                 font-lock-function-name-face
                                                 :weight
                                                 bold)))
-  "Face for displaying password-store entry names.")
+  "Face for displaying password-store directory names.")
 
 (defface pass-mode-password-face '((t . (:inherit widget-field)))
   "Face for displaying password-store entrys names.")
@@ -109,6 +108,16 @@
   (interactive)
   (pass-mode--goto-prev #'pass-mode-entry-at-point))
 
+(defun pass-mode-next-directory ()
+  "Move point to the next directory found."
+  (interactive)
+  (pass-mode--goto-next #'pass-mode-directory-at-point))
+
+(defun pass-mode-prev-directory ()
+  "Move point to the previous directory."
+  (interactive)
+  (pass-mode--goto-prev #'pass-mode-directory-at-point))
+
 (defun pass-mode-kill ()
   "Remove the entry at point."
   (interactive)
@@ -149,30 +158,62 @@ instead of reading the password from user input."
 
 (defun pass-mode-display-data ()
   "Display the password-store data into the current buffer."
-  (let ((entries (sort (pass-mode--get-entries)
-                       #'string-lessp)))
+  (let ((items (pass-mode--tree)))
     (pass-mode-display-header)
-    (dolist (entry entries)
-      (pass-mode-display-entry entry))))
+    (pass-mode-display-item items)))
 
 (defun pass-mode-display-header ()
-  "Display the header intothe current buffer."
-  (insert "Password-store contents:")
+  "Display the header in to the current buffer."
+  (insert (format "Password-store directory:"))
   (put-text-property (point-at-bol) (point) 'face 'pass-mode-header-face)
   (insert " ")
   (newline)
   (newline))
 
-(defun pass-mode-display-entry (entry)
-  "Display the entry ENTRY and the associated data into the current buffer."
-  (insert entry)
-  (add-text-properties (point-at-bol) (point)
-                       `(face pass-mode-entry-face pass-mode-entry ,entry))
-  (newline))
+(defun pass-mode-display-item (item &optional indent-level)
+  "Display the directory or entry ITEM into the current buffer."
+  (unless indent-level (setq indent-level 0))
+  (let ((directory (listp item)))
+    (pass-mode-display-item-prefix indent-level)
+    (if directory
+        (pass-mode-display-directory item indent-level)
+      (pass-mode-display-entry item indent-level))))
+
+(defun pass-mode-display-entry (entry indent-level)
+  "Display the password-store entry ENTRY into the current buffer."
+  (let ((entry-name (f-filename entry)))
+    (insert entry-name)
+    (add-text-properties (point-at-bol) (point)
+                         `(face pass-mode-entry-face pass-mode-entry ,entry))
+    (newline)))
+
+(defun pass-mode-display-directory (directory indent-level)
+  "Display the directory DIRECTORY into the current buffer.
+
+DIRECTORY is a list, its CAR being the name of the directory and
+its CDR the entries of the directory."
+  (let ((name (car directory))
+        (items (cdr directory)))
+    (insert name)
+    (add-text-properties (point-at-bol) (point)
+                         `(face pass-mode-directory-face pass-mode-directory ,name))
+    (newline)
+    (dolist (item items)
+      (pass-mode-display-item item (1+ indent-level)))))
+
+(defun pass-mode-display-item-prefix (indent-level)
+  (dotimes (i (max 0 (* (1- indent-level) 4)))
+      (insert " "))
+    (unless (zerop indent-level)
+      (insert "├── ")))
 
 (defun pass-mode-entry-at-point ()
   "Return the `pass-mode-entry' property at point."
   (get-text-property (point) 'pass-mode-entry))
+
+(defun pass-mode-directory-at-point ()
+  "Return the `pass-mode-directory' property at point."
+  (get-text-property (point) 'pass-mode-directory))
 
 (defun pass-mode-closest-entry ()
   "Return the closest entry in the current buffer, looking backward."
@@ -221,8 +262,21 @@ Similar to `save-excursion' but only restore the point."
        ,@body
        (goto-char (min ,point (point-max))))))
 
-(defun pass-mode--get-entries ()
-  (password-store-list))
+(defun pass-mode--tree (&optional subdir)
+  "Return a tree of all entries in SUBDIR.
+If SUBDIR is nil, return the entries of `(password-store-dir)'."
+  (unless subdir (setq subdir ""))
+  (let ((path (f-join (password-store-dir) subdir)))
+    (delq nil
+          (if (f-directory? path)
+              (cons (f-filename path)
+                    (mapcar 'pass-mode--tree
+                            (f-entries path)))
+            (when (equal (f-ext path) "gpg")
+              (password-store--file-to-entry path))))))
+
+(string-match-p "/" "hello/world")
+(split-string "hello/world" "/")
 
 (provide 'pass-mode)
 ;;; pass-mode.el ends here
