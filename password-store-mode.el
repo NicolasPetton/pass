@@ -45,6 +45,7 @@
     (define-key map (kbd "?") #'describe-mode)
     (define-key map (kbd "g") #'password-store-mode-update-buffer)
     (define-key map (kbd "i") #'password-store-mode-insert)
+    (define-key map (kbd "w") #'password-store-mode-copy)
     (define-key map (kbd "v") #'password-store-mode-view)
     (define-key map (kbd "RET") #'password-store-mode-view)
     (define-key map (kbd "q") #'password-store-mode-quit)
