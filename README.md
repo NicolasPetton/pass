@@ -8,7 +8,7 @@ All entries are displayed in a directory-like structure.
 
 This library depends on `password-store.el`.
 
-    M-x password-store
+    M-x pass
 
 The following keybindings are available:
 
@@ -24,3 +24,15 @@ The following keybindings are available:
 - `g`: Update the password-store buffer
 - `RET` or `v`: Go to the entry at point
 - `q`: Quit pass-mode
+
+## Contributing
+
+Yes, please do! See [CONTRIBUTING][] for guidelines.
+
+## License
+
+See [LICENSE][]. Copyright (c) 2015 Nicolas Petton & Damien Cassou.
+
+
+[CONTRIBUTING]: ./CONTRIBUTING.md
+[LICENSE]: ./LICENSE
