@@ -94,6 +94,7 @@
   (pass-mode)
   (pass-mode-update-buffer))
 
+;;;###autoload
 (defun pass ()
   "Open the password-store buffer."
   (interactive)
