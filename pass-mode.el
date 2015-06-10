@@ -30,6 +30,10 @@
 (require 'password-store)
 (require 'f)
 
+(defgroup pass-mode '()
+  "Major mode for password-store."
+  :group 'password-store)
+
 (defvar pass-mode-buffer-name "*Password-Store*"
   "Name of the pass-mode buffer.")
 
@@ -56,19 +60,23 @@
   "Keymap for `pass-mode'.")
 
 (defface pass-mode-header-face '((t . (:inherit font-lock-keyword-face)))
-  "Face for displaying the header of the pass-mode buffer.")
+  "Face for displaying the header of the pass-mode buffer."
+  :group 'pass-mode)
 
 (defface pass-mode-entry-face '((t . ()))
-  "Face for displaying pass-mode entry names.")
+  "Face for displaying pass-mode entry names."
+  :group 'pass-mode)
 
 (defface pass-mode-directory-face '((t . (:inherit
-                                                font-lock-function-name-face
-                                                :weight
-                                                bold)))
-  "Face for displaying password-store directory names.")
+                                          font-lock-function-name-face
+                                          :weight
+                                          bold)))
+  "Face for displaying password-store directory names."
+  :group 'pass-mode)
 
 (defface pass-mode-password-face '((t . (:inherit widget-field)))
-  "Face for displaying password-store entrys names.")
+  "Face for displaying password-store entrys names."
+  :group 'pass-mode)
 
 (defun pass-mode ()
   "Major mode for editing password-stores.
