@@ -217,12 +217,13 @@ the entries of the directory.  Add enough spaces so that each entry is
 indented according to INDENT-LEVEL."
   (let ((name (car directory))
         (items (cdr directory)))
-    (insert name)
-    (add-text-properties (point-at-bol) (point)
-                         `(face pass-mode-directory-face pass-mode-directory ,name))
-    (newline)
-    (dolist (item items)
-      (pass-mode-display-item item (1+ indent-level)))))
+    (when (not (string= name ".git"))
+      (insert name)
+      (add-text-properties (point-at-bol) (point)
+                           `(face pass-mode-directory-face pass-mode-directory ,name))
+      (newline)
+      (dolist (item items)
+        (pass-mode-display-item item (1+ indent-level))))))
 
 (defun pass-mode-display-item-prefix (indent-level)
   "Display some indenting text according to INDENT-LEVEL."
