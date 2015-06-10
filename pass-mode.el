@@ -226,10 +226,10 @@ indented according to INDENT-LEVEL."
 
 (defun pass-mode-display-item-prefix (indent-level)
   "Display some indenting text according to INDENT-LEVEL."
-  (dotimes (i (max 0 (* (1- indent-level) 4)))
-      (insert " "))
-    (unless (zerop indent-level)
-      (insert "├── ")))
+  (dotimes (_ (max 0 (* (1- indent-level) 4)))
+    (insert " "))
+  (unless (zerop indent-level)
+    (insert "├── ")))
 
 (defun pass-mode-entry-at-point ()
   "Return the `pass-mode-entry' property at point."
