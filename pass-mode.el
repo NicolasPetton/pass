@@ -191,12 +191,10 @@ ITEM."
     (pass-mode-display-item-prefix indent-level)
     (if directory
         (pass-mode-display-directory item indent-level)
-      (pass-mode-display-entry item indent-level))))
+      (pass-mode-display-entry item))))
 
-(defun pass-mode-display-entry (entry indent-level)
-  "Display the password-store entry ENTRY into the current buffer.
-Add enough spaces so that ENTRY is indented according to
-INDENT-LEVEL."
+(defun pass-mode-display-entry (entry)
+  "Display the password-store entry ENTRY into the current buffer."
   (let ((entry-name (f-filename entry)))
     (insert entry-name)
     (add-text-properties (point-at-bol) (point)
