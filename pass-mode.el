@@ -239,20 +239,20 @@ each entry is indented according to INDENT-LEVEL."
     (unless (bobp)
       (or (pass-mode-entry-at-point)
           (progn
-            (previous-line)
+            (forward-line -1)
             (pass-mode-closest-entry))))))
 
 (defun pass-mode--goto-next (pred)
   "Move point to the next match of PRED."
-  (next-line)
+  (forward-line)
   (while (not (or (eobp) (funcall pred)))
-    (next-line)))
+    (forward-line)))
 
 (defun pass-mode--goto-prev (pred)
   "Move point to the previous match of PRED."
-  (previous-line)
+  (forward-line -1)
   (while (not (or (bobp) (funcall pred)))
-    (previous-line)))
+    (forward-line -1)))
 
 (defmacro pass-mode--with-writable-buffer (&rest body)
   "Evaluate BODY with the current buffer not in `read-only-mode'."
