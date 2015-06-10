@@ -1,8 +1,8 @@
 # pass-mode
 
-A major-mode to manage your password-store (pass) keychain.
-
-All entries are displayed in a directory-like structure.
+A major-mode to manage your
+[password-store](http://passwordstore.org/) (pass) keychain.  The
+keychian entries are displayed in a directory-like structure.
 
 # Getting started
 
