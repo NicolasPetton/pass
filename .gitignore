@@ -9,3 +9,4 @@ doc/pass-mode.info
 # Packages
 .cask
 elpa
+/dist/
