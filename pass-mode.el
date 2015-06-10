@@ -82,7 +82,6 @@
   "Major mode for editing password-stores.
 
 \\{pass-mode-map}"
-  (interactive)
   (kill-all-local-variables)
   (setq major-mode 'pass-mode
         mode-name 'Password-Store)
