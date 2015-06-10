@@ -1,8 +1,12 @@
-;;; pass-mode.el --- Major mode for password-store.el
+;;; pass-mode.el --- Major mode for password-store.el -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2015  Nicolas Petton
+;; Copyright (C) 2015  Nicolas Petton & Damien Cassou
 
 ;; Author: Nicolas Petton <petton.nicolas@gmail.com>
+;; Version: 0.1
+;; GIT: https://github.com/NicolasPetton/password-store-mode
+;; Package-Requires: ((emacs "24") (password-store "0.1") (f "0.17"))
+;; Created: 09 Jun 2015
 ;; Keywords: password-store, password, keychain
 
 ;; This program is free software; you can redistribute it and/or modify
