@@ -171,7 +171,9 @@ instead of reading the password from user input."
   (newline))
 
 (defun pass-mode-display-item (item &optional indent-level)
-  "Display the directory or entry ITEM into the current buffer."
+  "Display the directory or entry ITEM into the current buffer.
+If INDENT-LEVEL is specified, add enough spaces before displaying
+ITEM."
   (unless indent-level (setq indent-level 0))
   (let ((directory (listp item)))
     (pass-mode-display-item-prefix indent-level)
@@ -180,7 +182,9 @@ instead of reading the password from user input."
       (pass-mode-display-entry item indent-level))))
 
 (defun pass-mode-display-entry (entry indent-level)
-  "Display the password-store entry ENTRY into the current buffer."
+  "Display the password-store entry ENTRY into the current buffer.
+Add enough spaces so that ENTRY is indented according to
+INDENT-LEVEL."
   (let ((entry-name (f-filename entry)))
     (insert entry-name)
     (add-text-properties (point-at-bol) (point)
@@ -191,7 +195,8 @@ instead of reading the password from user input."
   "Display the directory DIRECTORY into the current buffer.
 
 DIRECTORY is a list, its CAR being the name of the directory and
-its CDR the entries of the directory."
+its CDR the entries of the directory. Add enough spaces so that
+each entry is indented according to INDENT-LEVEL."
   (let ((name (car directory))
         (items (cdr directory)))
     (insert name)
@@ -202,6 +207,7 @@ its CDR the entries of the directory."
       (pass-mode-display-item item (1+ indent-level)))))
 
 (defun pass-mode-display-item-prefix (indent-level)
+  "Display some indenting text according to INDENT-LEVEL."
   (dotimes (i (max 0 (* (1- indent-level) 4)))
       (insert " "))
     (unless (zerop indent-level)
@@ -247,6 +253,7 @@ its CDR the entries of the directory."
          (read-only-mode 1)))))
 
 (defmacro pass-mode--with-closest-entry (varname &rest body)
+  "Bound VARNAME to the closest entry before point and evaluate BODY."
   (declare (indent 1) (debug t))
   `(let ((,varname (pass-mode-closest-entry)))
      (if ,varname
