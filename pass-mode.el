@@ -204,9 +204,9 @@ ITEM."
 (defun pass-mode-display-directory (directory indent-level)
   "Display the directory DIRECTORY into the current buffer.
 
-DIRECTORY is a list, its CAR being the name of the directory and
-its CDR the entries of the directory. Add enough spaces so that
-each entry is indented according to INDENT-LEVEL."
+DIRECTORY is a list, its CAR being the name of the directory and its CDR
+the entries of the directory.  Add enough spaces so that each entry is
+indented according to INDENT-LEVEL."
   (let ((name (car directory))
         (items (cdr directory)))
     (insert name)
