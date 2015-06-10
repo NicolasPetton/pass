@@ -122,6 +122,14 @@
   (interactive)
   (pass-mode--goto-prev #'pass-mode-directory-at-point))
 
+(defmacro pass-mode--with-closest-entry (varname &rest body)
+  "Bound VARNAME to the closest entry before point and evaluate BODY."
+  (declare (indent 1) (debug t))
+  `(let ((,varname (pass-mode-closest-entry)))
+     (if ,varname
+         ,@body
+       (message "No entry at point"))))
+
 (defun pass-mode-kill ()
   "Remove the entry at point."
   (interactive)
@@ -255,14 +263,6 @@ each entry is indented according to INDENT-LEVEL."
        ,@body
        (when ,read-only
          (read-only-mode 1)))))
-
-(defmacro pass-mode--with-closest-entry (varname &rest body)
-  "Bound VARNAME to the closest entry before point and evaluate BODY."
-  (declare (indent 1) (debug t))
-  `(let ((,varname (pass-mode-closest-entry)))
-     (if ,varname
-         ,@body
-       (message "No entry at point"))))
 
 (defmacro pass-mode--save-point (&rest body)
   "Evaluate BODY and restore the point.
