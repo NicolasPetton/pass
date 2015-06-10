@@ -4,7 +4,12 @@ A major-mode to manage your
 [password-store](http://passwordstore.org/) (pass) keychain.  The
 keychian entries are displayed in a directory-like structure.
 
-# Getting started
+## Installing
+
+Use [melpa](http://melpa.milkbox.net).
+
+
+## Getting started
 
 This library depends on `password-store.el`.
 
