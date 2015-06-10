@@ -3,6 +3,7 @@
 ;; Copyright (C) 2015  Nicolas Petton & Damien Cassou
 
 ;; Author: Nicolas Petton <petton.nicolas@gmail.com>
+;;         Damien Cassou <damien@cassou.me>
 ;; Version: 0.1
 ;; GIT: https://github.com/NicolasPetton/password-store-mode
 ;; Package-Requires: ((emacs "24") (password-store "0.1") (f "0.17"))
