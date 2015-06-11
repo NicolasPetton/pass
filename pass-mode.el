@@ -294,8 +294,5 @@ If SUBDIR is nil, return the entries of `(password-store-dir)'."
             (when (equal (f-ext path) "gpg")
               (password-store--file-to-entry path))))))
 
-(string-match-p "/" "hello/world")
-(split-string "hello/world" "/")
-
 (provide 'pass-mode)
 ;;; pass-mode.el ends here
