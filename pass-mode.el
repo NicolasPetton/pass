@@ -49,12 +49,12 @@
     (define-key map (kbd "M-p") #'pass-mode-prev-directory)
     (define-key map (kbd "k") #'pass-mode-kill)
     (define-key map (kbd "s") #'isearch-forward)
-    (define-key map (kbd "r") #'isearch-backward)
     (define-key map (kbd "?") #'describe-mode)
     (define-key map (kbd "g") #'pass-mode-update-buffer)
     (define-key map (kbd "i") #'pass-mode-insert)
     (define-key map (kbd "w") #'pass-mode-copy)
     (define-key map (kbd "v") #'pass-mode-view)
+    (define-key map (kbd "r") #'pass-mode-rename)
     (define-key map (kbd "RET") #'pass-mode-view)
     (define-key map (kbd "q") #'pass-mode-quit)
     map)
@@ -133,6 +133,13 @@
      (if ,varname
          ,@body
        (message "No entry at point"))))
+
+(defun pass-mode-rename (new-name)
+  "Rename the entry at point to NEW-NAME."
+  (interactive (list (read-string "Rename entry to: " (pass-mode-closest-entry))))
+  (pass-mode--with-closest-entry entry
+    (password-store-rename entry new-name)
+    (pass-mode-update-buffer)))
 
 (defun pass-mode-kill ()
   "Remove the entry at point."
