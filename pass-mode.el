@@ -75,10 +75,6 @@
   "Face for displaying password-store directory names."
   :group 'pass-mode)
 
-(defface pass-mode-password-face '((t . (:inherit widget-field)))
-  "Face for displaying password-store entrys names."
-  :group 'pass-mode)
-
 (defun pass-mode ()
   "Major mode for editing password-stores.
 
@@ -101,10 +97,9 @@
   (interactive)
   (if (get-buffer pass-mode-buffer-name)
       (switch-to-buffer pass-mode-buffer-name)
-    (progn
-      (let ((buf (get-buffer-create pass-mode-buffer-name)))
-        (pop-to-buffer buf)
-        (pass-mode-setup-buffer)))))
+    (let ((buf (get-buffer-create pass-mode-buffer-name)))
+      (pop-to-buffer buf)
+      (pass-mode-setup-buffer))))
 
 (defun pass-mode-quit ()
   "Kill the buffer quitting the window and forget the pass-mode."
@@ -185,9 +180,8 @@ instead of reading the password from user input."
 
 (defun pass-mode-display-header ()
   "Display the header in to the current buffer."
-  (insert (format "Password-store directory:"))
+  (insert "Password-store directory:")
   (put-text-property (point-at-bol) (point) 'face 'pass-mode-header-face)
-  (insert " ")
   (newline)
   (newline))
 
