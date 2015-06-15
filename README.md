@@ -1,4 +1,4 @@
-# pass-mode
+# pass
 
 A major-mode to manage your
 [password-store](http://passwordstore.org/) (pass) keychain.  The
@@ -28,7 +28,7 @@ The following keybindings are available:
 - `?`: Help
 - `g`: Update the password-store buffer
 - `RET` or `v`: Go to the entry at point
-- `q`: Quit pass-mode
+- `q`: Quit pass
 
 ## Contributing
 

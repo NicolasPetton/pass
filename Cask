@@ -1,6 +1,6 @@
 (source melpa)
 
-(package-file "pass-mode.el")
+(package-file "pass.el")
 
 (development
  (depends-on "ert"))

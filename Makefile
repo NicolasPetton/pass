@@ -13,7 +13,7 @@ USER_ELPA_D  = $(EMACS_D)/elpa
 
 SRCS         = $(filter-out %-pkg.el, $(wildcard *.el))
 TESTS        = $(wildcard test/*.el)
-TAR          = $(DIST)/pass-mode-$(VERSION).tar
+TAR          = $(DIST)/pass-$(VERSION).tar
 
 
 .PHONY: all deps check install uninstall reinstall clean-all clean
@@ -33,7 +33,7 @@ install : $(TAR)
 	--eval '(package-install-file "$(PROJ_ROOT)/$(TAR)")'
 
 uninstall :
-	rm -rf $(USER_ELPA_D)/pass-mode-*
+	rm -rf $(USER_ELPA_D)/pass-*
 
 reinstall : clean uninstall install
 

@@ -1,4 +1,4 @@
-;;; pass-mode-tests.el --- Tests for pass-mode.el
+;;; pass-tests.el --- Tests for pass.el
 
 ;; Copyright (C) 2013 Damien Cassou
 
@@ -27,6 +27,6 @@
 
 (require 'ert)
 
-(provide 'pass-mode-tests)
+(provide 'pass-tests)
 
-;;; pass-mode-tests.el ends here
+;;; pass-tests.el ends here

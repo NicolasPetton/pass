@@ -1,11 +1,11 @@
-;;; pass-mode.el --- Major mode for password-store.el -*- lexical-binding: t; -*-
+;;; pass.el --- Major mode for password-store.el -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2015  Nicolas Petton & Damien Cassou
 
 ;; Author: Nicolas Petton <petton.nicolas@gmail.com>
 ;;         Damien Cassou <damien@cassou.me>
 ;; Version: 0.1
-;; GIT: https://github.com/NicolasPetton/password-store-mode
+;; GIT: https://github.com/NicolasPetton/pass
 ;; Package-Requires: ((emacs "24") (password-store "0.1") (f "0.17"))
 ;; Created: 09 Jun 2015
 ;; Keywords: password-store, password, keychain
@@ -31,49 +31,49 @@
 (require 'password-store)
 (require 'f)
 
-(defgroup pass-mode '()
+(defgroup pass '()
   "Major mode for password-store."
   :group 'password-store)
 
-(defvar pass-mode-buffer-name "*Password-Store*"
-  "Name of the pass-mode buffer.")
+(defvar pass-buffer-name "*Password-Store*"
+  "Name of the pass buffer.")
 
 (defvar pass-mode-hook nil
   "Mode hook for `pass-mode'.")
 
 (defvar pass-mode-map
   (let ((map (make-sparse-keymap)))
-    (define-key map (kbd "n") #'pass-mode-next-entry)
-    (define-key map (kbd "p") #'pass-mode-prev-entry)
-    (define-key map (kbd "M-n") #'pass-mode-next-directory)
-    (define-key map (kbd "M-p") #'pass-mode-prev-directory)
-    (define-key map (kbd "k") #'pass-mode-kill)
+    (define-key map (kbd "n") #'pass-next-entry)
+    (define-key map (kbd "p") #'pass-prev-entry)
+    (define-key map (kbd "M-n") #'pass-next-directory)
+    (define-key map (kbd "M-p") #'pass-prev-directory)
+    (define-key map (kbd "k") #'pass-kill)
     (define-key map (kbd "s") #'isearch-forward)
     (define-key map (kbd "?") #'describe-mode)
-    (define-key map (kbd "g") #'pass-mode-update-buffer)
-    (define-key map (kbd "i") #'pass-mode-insert)
-    (define-key map (kbd "w") #'pass-mode-copy)
-    (define-key map (kbd "v") #'pass-mode-view)
-    (define-key map (kbd "r") #'pass-mode-rename)
-    (define-key map (kbd "RET") #'pass-mode-view)
-    (define-key map (kbd "q") #'pass-mode-quit)
+    (define-key map (kbd "g") #'pass-update-buffer)
+    (define-key map (kbd "i") #'pass-insert)
+    (define-key map (kbd "w") #'pass-copy)
+    (define-key map (kbd "v") #'pass-view)
+    (define-key map (kbd "r") #'pass-rename)
+    (define-key map (kbd "RET") #'pass-view)
+    (define-key map (kbd "q") #'pass-quit)
     map)
   "Keymap for `pass-mode'.")
 
 (defface pass-mode-header-face '((t . (:inherit font-lock-keyword-face)))
-  "Face for displaying the header of the pass-mode buffer."
-  :group 'pass-mode)
+  "Face for displaying the header of the pass buffer."
+  :group 'pass)
 
 (defface pass-mode-entry-face '((t . ()))
-  "Face for displaying pass-mode entry names."
-  :group 'pass-mode)
+  "Face for displaying pass entry names."
+  :group 'pass)
 
 (defface pass-mode-directory-face '((t . (:inherit
                                           font-lock-function-name-face
                                           :weight
                                           bold)))
   "Face for displaying password-store directory names."
-  :group 'pass-mode)
+  :group 'pass)
 
 (defun pass-mode ()
   "Major mode for editing password-stores.
@@ -86,78 +86,78 @@
   (use-local-map pass-mode-map)
   (run-hooks 'pass-mode-hook))
 
-(defun pass-mode-setup-buffer ()
+(defun pass-setup-buffer ()
   "Setup the password-store buffer."
   (pass-mode)
-  (pass-mode-update-buffer))
+  (pass-update-buffer))
 
 ;;;###autoload
 (defun pass ()
   "Open the password-store buffer."
   (interactive)
-  (if (get-buffer pass-mode-buffer-name)
-      (switch-to-buffer pass-mode-buffer-name)
-    (let ((buf (get-buffer-create pass-mode-buffer-name)))
+  (if (get-buffer pass-buffer-name)
+      (switch-to-buffer pass-buffer-name)
+    (let ((buf (get-buffer-create pass-buffer-name)))
       (pop-to-buffer buf)
-      (pass-mode-setup-buffer))))
+      (pass-setup-buffer))))
 
-(defun pass-mode-quit ()
-  "Kill the buffer quitting the window and forget the pass-mode."
+(defun pass-quit ()
+  "Kill the buffer quitting the window."
   (interactive)
   (quit-window t))
 
-(defun pass-mode-next-entry ()
+(defun pass-next-entry ()
   "Move point to the next entry found."
   (interactive)
-  (pass-mode--goto-next #'pass-mode-entry-at-point))
+  (pass--goto-next #'pass-entry-at-point))
 
-(defun pass-mode-prev-entry ()
+(defun pass-prev-entry ()
   "Move point to the previous entry."
   (interactive)
-  (pass-mode--goto-prev #'pass-mode-entry-at-point))
+  (pass--goto-prev #'pass-entry-at-point))
 
-(defun pass-mode-next-directory ()
+(defun pass-next-directory ()
   "Move point to the next directory found."
   (interactive)
-  (pass-mode--goto-next #'pass-mode-directory-at-point))
+  (pass--goto-next #'pass-directory-at-point))
 
-(defun pass-mode-prev-directory ()
+(defun pass-prev-directory ()
   "Move point to the previous directory."
   (interactive)
-  (pass-mode--goto-prev #'pass-mode-directory-at-point))
+  (pass--goto-prev #'pass-directory-at-point))
 
-(defmacro pass-mode--with-closest-entry (varname &rest body)
+(defmacro pass--with-closest-entry (varname &rest body)
   "Bound VARNAME to the closest entry before point and evaluate BODY."
   (declare (indent 1) (debug t))
-  `(let ((,varname (pass-mode-closest-entry)))
+  `(let ((,varname (pass-closest-entry)))
      (if ,varname
          ,@body
        (message "No entry at point"))))
 
-(defun pass-mode-rename (new-name)
+(defun pass-rename (new-name)
   "Rename the entry at point to NEW-NAME."
-  (interactive (list (read-string "Rename entry to: " (pass-mode-closest-entry))))
-  (pass-mode--with-closest-entry entry
+  (interactive (list (read-string "Rename entry to: " (pass-closest-entry))))
+  (pass--with-closest-entry entry
     (password-store-rename entry new-name)
-    (pass-mode-update-buffer)))
+    (pass-update-buffer)))
 
-(defun pass-mode-kill ()
+(defun pass-kill ()
   "Remove the entry at point."
   (interactive)
-  (pass-mode--with-closest-entry entry
+  (pass--with-closest-entry entry
     (when (yes-or-no-p (format "Do you want remove the entry %s? " entry))
       (password-store-remove entry)
-      (pass-mode-update-buffer))))
+      (pass-update-buffer))))
 
-(defun pass-mode-update-buffer ()
+(defun pass-update-buffer ()
   "Update the current buffer contents."
   (interactive)
-  (pass-mode--save-point
-    (pass-mode--with-writable-buffer
+  (pass--save-point
+    (pass--with-writable-buffer
       (delete-region (point-min) (point-max))
-      (pass-mode-display-data))))
+      (pass-display-data))))
 
-(defun pass-mode-insert (&optional arg)
+(defun pass-insert (&optional arg)
   "Insert an entry to the password-store.
 When called with a prefix argument ARG, use a generated password
 instead of reading the password from user input."
@@ -165,53 +165,53 @@ instead of reading the password from user input."
   (if arg
       (call-interactively #'password-store-generate)
     (call-interactively #'password-store-insert))
-  (pass-mode-update-buffer))
+  (pass-update-buffer))
 
-(defun pass-mode-view ()
+(defun pass-view ()
   "Visit the entry at point."
   (interactive)
-  (pass-mode--with-closest-entry entry
+  (pass--with-closest-entry entry
     (password-store-edit entry)))
 
-(defun pass-mode-copy ()
+(defun pass-copy ()
   "Visit the entry at point."
   (interactive)
-  (pass-mode--with-closest-entry entry
+  (pass--with-closest-entry entry
     (password-store-copy entry)))
 
-(defun pass-mode-display-data ()
+(defun pass-display-data ()
   "Display the password-store data into the current buffer."
-  (let ((items (pass-mode--tree)))
-    (pass-mode-display-header)
-    (pass-mode-display-item items)))
+  (let ((items (pass--tree)))
+    (pass-display-header)
+    (pass-display-item items)))
 
-(defun pass-mode-display-header ()
+(defun pass-display-header ()
   "Display the header in to the current buffer."
   (insert "Password-store directory:")
   (put-text-property (point-at-bol) (point) 'face 'pass-mode-header-face)
   (newline)
   (newline))
 
-(defun pass-mode-display-item (item &optional indent-level)
+(defun pass-display-item (item &optional indent-level)
   "Display the directory or entry ITEM into the current buffer.
 If INDENT-LEVEL is specified, add enough spaces before displaying
 ITEM."
   (unless indent-level (setq indent-level 0))
   (let ((directory (listp item)))
-    (pass-mode-display-item-prefix indent-level)
+    (pass-display-item-prefix indent-level)
     (if directory
-        (pass-mode-display-directory item indent-level)
-      (pass-mode-display-entry item))))
+        (pass-display-directory item indent-level)
+      (pass-display-entry item))))
 
-(defun pass-mode-display-entry (entry)
+(defun pass-display-entry (entry)
   "Display the password-store entry ENTRY into the current buffer."
   (let ((entry-name (f-filename entry)))
     (insert entry-name)
     (add-text-properties (point-at-bol) (point)
-                         `(face pass-mode-entry-face pass-mode-entry ,entry))
+                         `(face pass-mode-entry-face pass-entry ,entry))
     (newline)))
 
-(defun pass-mode-display-directory (directory indent-level)
+(defun pass-display-directory (directory indent-level)
   "Display the directory DIRECTORY into the current buffer.
 
 DIRECTORY is a list, its CAR being the name of the directory and its CDR
@@ -222,48 +222,48 @@ indented according to INDENT-LEVEL."
     (when (not (string= name ".git"))
       (insert name)
       (add-text-properties (point-at-bol) (point)
-                           `(face pass-mode-directory-face pass-mode-directory ,name))
+                           `(face pass-mode-directory-face pass-directory ,name))
       (newline)
       (dolist (item items)
-        (pass-mode-display-item item (1+ indent-level))))))
+        (pass-display-item item (1+ indent-level))))))
 
-(defun pass-mode-display-item-prefix (indent-level)
+(defun pass-display-item-prefix (indent-level)
   "Display some indenting text according to INDENT-LEVEL."
   (dotimes (_ (max 0 (* (1- indent-level) 4)))
     (insert " "))
   (unless (zerop indent-level)
     (insert "├── ")))
 
-(defun pass-mode-entry-at-point ()
-  "Return the `pass-mode-entry' property at point."
-  (get-text-property (point) 'pass-mode-entry))
+(defun pass-entry-at-point ()
+  "Return the `pass-entry' property at point."
+  (get-text-property (point) 'pass-entry))
 
-(defun pass-mode-directory-at-point ()
-  "Return the `pass-mode-directory' property at point."
-  (get-text-property (point) 'pass-mode-directory))
+(defun pass-directory-at-point ()
+  "Return the `pass-directory' property at point."
+  (get-text-property (point) 'pass-directory))
 
-(defun pass-mode-closest-entry ()
+(defun pass-closest-entry ()
   "Return the closest entry in the current buffer, looking backward."
   (save-excursion
     (unless (bobp)
-      (or (pass-mode-entry-at-point)
+      (or (pass-entry-at-point)
           (progn
             (forward-line -1)
-            (pass-mode-closest-entry))))))
+            (pass-closest-entry))))))
 
-(defun pass-mode--goto-next (pred)
+(defun pass--goto-next (pred)
   "Move point to the next match of PRED."
   (forward-line)
   (while (not (or (eobp) (funcall pred)))
     (forward-line)))
 
-(defun pass-mode--goto-prev (pred)
+(defun pass--goto-prev (pred)
   "Move point to the previous match of PRED."
   (forward-line -1)
   (while (not (or (bobp) (funcall pred)))
     (forward-line -1)))
 
-(defmacro pass-mode--with-writable-buffer (&rest body)
+(defmacro pass--with-writable-buffer (&rest body)
   "Evaluate BODY with the current buffer not in `read-only-mode'."
   (declare (indent 0) (debug t))
   (let ((read-only (make-symbol "ro")))
@@ -273,7 +273,7 @@ indented according to INDENT-LEVEL."
        (when ,read-only
          (read-only-mode 1)))))
 
-(defmacro pass-mode--save-point (&rest body)
+(defmacro pass--save-point (&rest body)
   "Evaluate BODY and restore the point.
 Similar to `save-excursion' but only restore the point."
   (declare (indent 0) (debug t))
@@ -282,7 +282,7 @@ Similar to `save-excursion' but only restore the point."
        ,@body
        (goto-char (min ,point (point-max))))))
 
-(defun pass-mode--tree (&optional subdir)
+(defun pass--tree (&optional subdir)
   "Return a tree of all entries in SUBDIR.
 If SUBDIR is nil, return the entries of `(password-store-dir)'."
   (unless subdir (setq subdir ""))
@@ -290,10 +290,10 @@ If SUBDIR is nil, return the entries of `(password-store-dir)'."
     (delq nil
           (if (f-directory? path)
               (cons (f-filename path)
-                    (mapcar 'pass-mode--tree
+                    (mapcar 'pass--tree
                             (f-entries path)))
             (when (equal (f-ext path) "gpg")
               (password-store--file-to-entry path))))))
 
-(provide 'pass-mode)
-;;; pass-mode.el ends here
+(provide 'pass)
+;;; pass.el ends here
