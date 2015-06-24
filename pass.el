@@ -264,14 +264,10 @@ indented according to INDENT-LEVEL."
     (forward-line -1)))
 
 (defmacro pass--with-writable-buffer (&rest body)
-  "Evaluate BODY with the current buffer not in `read-only-mode'."
+  "Evaluate BODY as if the current buffer was not in `read-only-mode'."
   (declare (indent 0) (debug t))
-  (let ((read-only (make-symbol "ro")))
-    `(let ((,read-only buffer-read-only))
-       (read-only-mode -1)
-       ,@body
-       (when ,read-only
-         (read-only-mode 1)))))
+  `(let ((inhibit-read-only t))
+    ,@body))
 
 (defmacro pass--save-point (&rest body)
   "Evaluate BODY and restore the point.
