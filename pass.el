@@ -96,7 +96,9 @@
   "Open the password-store buffer."
   (interactive)
   (if (get-buffer pass-buffer-name)
-      (switch-to-buffer pass-buffer-name)
+      (progn
+        (switch-to-buffer pass-buffer-name)
+        (pass-update-buffer))
     (let ((buf (get-buffer-create pass-buffer-name)))
       (pop-to-buffer buf)
       (pass-setup-buffer))))
