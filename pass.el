@@ -151,6 +151,12 @@
       (password-store-remove entry)
       (pass-update-buffer))))
 
+(defmacro pass--with-writable-buffer (&rest body)
+  "Evaluate BODY as if the current buffer was not in `read-only-mode'."
+  (declare (indent 0) (debug t))
+  `(let ((inhibit-read-only t))
+     ,@body))
+
 (defun pass-update-buffer ()
   "Update the current buffer contents."
   (interactive)
@@ -264,12 +270,6 @@ indented according to INDENT-LEVEL."
   (forward-line -1)
   (while (not (or (bobp) (funcall pred)))
     (forward-line -1)))
-
-(defmacro pass--with-writable-buffer (&rest body)
-  "Evaluate BODY as if the current buffer was not in `read-only-mode'."
-  (declare (indent 0) (debug t))
-  `(let ((inhibit-read-only t))
-    ,@body))
 
 (defmacro pass--save-point (&rest body)
   "Evaluate BODY and restore the point.
