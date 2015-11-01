@@ -4,7 +4,7 @@
 
 ;; Author: Nicolas Petton <petton.nicolas@gmail.com>
 ;;         Damien Cassou <damien@cassou.me>
-;; Version: 1.0
+;; Version: 1.1
 ;; GIT: https://github.com/NicolasPetton/pass
 ;; Package-Requires: ((emacs "24") (password-store "0.1") (f "0.17"))
 ;; Created: 09 Jun 2015
@@ -103,6 +103,12 @@
       (pop-to-buffer buf)
       (pass-setup-buffer))))
 
+(defmacro pass--with-writable-buffer (&rest body)
+  "Evaluate BODY as if the current buffer was not in `read-only-mode'."
+  (declare (indent 0) (debug t))
+  `(let ((inhibit-read-only t))
+     ,@body))
+
 (defun pass-quit ()
   "Kill the buffer quitting the window."
   (interactive)
@@ -150,12 +156,6 @@
     (when (yes-or-no-p (format "Do you want remove the entry %s? " entry))
       (password-store-remove entry)
       (pass-update-buffer))))
-
-(defmacro pass--with-writable-buffer (&rest body)
-  "Evaluate BODY as if the current buffer was not in `read-only-mode'."
-  (declare (indent 0) (debug t))
-  `(let ((inhibit-read-only t))
-     ,@body))
 
 (defun pass-update-buffer ()
   "Update the current buffer contents."
