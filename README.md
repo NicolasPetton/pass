@@ -6,7 +6,7 @@ keychain entries are displayed in a directory-like structure.
 
 ## Installing
 
-Use [melpa](http://melpa.milkbox.net).
+Use [melpa](https://melpa.org/).
 
 
 ## Getting started
