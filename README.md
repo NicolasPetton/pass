@@ -2,7 +2,7 @@
 
 A major-mode to manage your
 [password-store](http://passwordstore.org/) (pass) keychain.  The
-keychian entries are displayed in a directory-like structure.
+keychain entries are displayed in a directory-like structure.
 
 ## Installing
 
