@@ -81,7 +81,8 @@
 \\{pass-mode-map}"
   (kill-all-local-variables)
   (setq major-mode 'pass-mode
-        mode-name 'Password-Store)
+        mode-name 'Password-Store
+        default-directory (password-store-dir))
   (read-only-mode)
   (use-local-map pass-mode-map)
   (run-hooks 'pass-mode-hook))
