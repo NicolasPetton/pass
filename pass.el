@@ -110,6 +110,15 @@
   `(let ((inhibit-read-only t))
      ,@body))
 
+(defmacro pass--save-point (&rest body)
+  "Evaluate BODY and restore the point.
+Similar to `save-excursion' but only restore the point."
+  (declare (indent 0) (debug t))
+  (let ((point (make-symbol "point")))
+    `(let ((,point (point)))
+       ,@body
+       (goto-char (min ,point (point-max))))))
+
 (defun pass-quit ()
   "Kill the buffer quitting the window."
   (interactive)
@@ -271,15 +280,6 @@ indented according to INDENT-LEVEL."
   (forward-line -1)
   (while (not (or (bobp) (funcall pred)))
     (forward-line -1)))
-
-(defmacro pass--save-point (&rest body)
-  "Evaluate BODY and restore the point.
-Similar to `save-excursion' but only restore the point."
-  (declare (indent 0) (debug t))
-  (let ((point (make-symbol "point")))
-    `(let ((,point (point)))
-       ,@body
-       (goto-char (min ,point (point-max))))))
 
 (defun pass--tree (&optional subdir)
   "Return a tree of all entries in SUBDIR.
