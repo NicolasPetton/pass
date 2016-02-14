@@ -52,6 +52,7 @@
     (define-key map (kbd "?") #'describe-mode)
     (define-key map (kbd "g") #'pass-update-buffer)
     (define-key map (kbd "i") #'pass-insert)
+    (define-key map (kbd "I") #'pass-insert-generated)
     (define-key map (kbd "w") #'pass-copy)
     (define-key map (kbd "v") #'pass-view)
     (define-key map (kbd "r") #'pass-rename)
@@ -175,14 +176,19 @@ Similar to `save-excursion' but only restore the point."
       (delete-region (point-min) (point-max))
       (pass-display-data))))
 
-(defun pass-insert (&optional arg)
+(defun pass-insert ()
+  (interactive)
   "Insert an entry to the password-store.
-When called with a prefix argument ARG, use a generated password
-instead of reading the password from user input."
-  (interactive "P")
-  (if arg
-      (call-interactively #'password-store-generate)
-    (call-interactively #'password-store-insert))
+The password is read from user input."
+  (call-interactively #'password-store-insert)
+  (pass-update-buffer))
+
+(defun pass-insert-generated ()
+  (interactive)
+  "Insert an entry to the password-store.
+Use a generated password instead of reading the password from
+user input."
+  (call-interactively #'password-store-generate)
   (pass-update-buffer))
 
 (defun pass-view ()
