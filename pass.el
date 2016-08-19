@@ -4,7 +4,7 @@
 
 ;; Author: Nicolas Petton <petton.nicolas@gmail.com>
 ;;         Damien Cassou <damien@cassou.me>
-;; Version: 1.3
+;; Version: 1.4
 ;; GIT: https://github.com/NicolasPetton/pass
 ;; Package-Requires: ((emacs "24") (password-store "0.1") (f "0.17"))
 ;; Created: 09 Jun 2015
@@ -351,7 +351,10 @@ If SUBDIR is nil, return the entries of `(password-store-dir)'."
 \\{pass-view-mode-map}"
   (pass-view-toggle-password)
   (setq-local font-lock-defaults '(pass-view-font-lock-keywords))
-  (font-lock-mode 1))
+  (font-lock-mode 1)
+  (message
+   (substitute-command-keys
+    "Press <\\[pass-view-toggle-password]> to display & edit the password")))
 
 (add-to-list 'auto-mode-alist '("\\.password-store/" . pass-view-mode))
 
