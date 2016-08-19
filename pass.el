@@ -337,12 +337,16 @@ If SUBDIR is nil, return the entries of `(password-store-dir)'."
     (remove-text-properties (point-min) (line-end-position)
                             '(display nil))))
 
+(defvar pass-view-font-lock-keywords '("^[^:\n]+:" . 'font-lock-keyword-face)
+  "Font lock keywords for pass-view-mode.")
+
 (define-derived-mode pass-view-mode nil "Pass-View"
   "Major mode for viewing password-store entries.
 
 \\{pass-view-mode-map}"
-  (pass-view-mask-password)
-  (set-buffer-modified-p nil))
+  (pass-view-toggle-password)
+  (setq-local font-lock-defaults '(pass-view-font-lock-keywords))
+  (font-lock-mode 1))
 
 (add-to-list 'auto-mode-alist '("\\.password-store/" . pass-view-mode))
 
