@@ -300,5 +300,59 @@ If SUBDIR is nil, return the entries of `(password-store-dir)'."
             (when (equal (f-ext path) "gpg")
               (password-store--file-to-entry path))))))
 
+;;; major mode for viewing entries
+
+(defvar pass-view-mask "·············"
+  "Mask used to hide passwords.")
+
+(defvar pass-view-mode-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map (kbd "C-c C-c") #'pass-view-toggle-password)
+    (define-key map (kbd "C-c C-w") #'pass-view-copy-password)
+    map))
+
+(defun pass-view-toggle-password ()
+  "Enable or disable password hiding."
+  (interactive)
+  (save-excursion
+    (goto-char (point-min))
+    (let ((buf-modified (buffer-modified-p)))
+      (if (string= (get-text-property (point) 'display)
+                   pass-view-mask)
+          (pass-view-unmask-password)
+        (pass-view-mask-password))
+      (set-buffer-modified-p buf-modified))))
+
+(defun pass-view-copy-password ()
+  "Copy the password of the entry in the current buffer."
+  (interactive)
+  (save-excursion
+    (goto-char (point-min))
+    (copy-region-as-kill (point) (line-end-position))))
+
+(defun pass-view-mask-password ()
+  "Mask the password of the current buffer."
+  (let ((inhibit-read-only t))
+    (save-excursion
+      (goto-char (point-min))
+      (set-text-properties (point-min) (line-end-position)
+                           `(display ,pass-view-mask)))))
+
+(defun pass-view-unmask-password ()
+  "Show the password in the current buffer."
+  (save-excursion
+    (goto-char (point-min))
+    (remove-text-properties (point-min) (line-end-position)
+                            '(display nil))))
+
+(define-derived-mode pass-view-mode nil "Pass-View"
+  "Major mode for viewing password-store entries.
+
+\\{pass-view-mode-map}"
+  (pass-view-mask-password)
+  (set-buffer-modified-p nil))
+
+(add-to-list 'auto-mode-alist '("\\.password-store/" . pass-view-mode))
+
 (provide 'pass)
 ;;; pass.el ends here
