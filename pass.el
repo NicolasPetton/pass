@@ -4,7 +4,7 @@
 
 ;; Author: Nicolas Petton <petton.nicolas@gmail.com>
 ;;         Damien Cassou <damien@cassou.me>
-;; Version: 1.1
+;; Version: 1.3
 ;; GIT: https://github.com/NicolasPetton/pass
 ;; Package-Requires: ((emacs "24") (password-store "0.1") (f "0.17"))
 ;; Created: 09 Jun 2015
@@ -115,7 +115,12 @@ Similar to `save-excursion' but only restore the point."
 (defun pass-quit ()
   "Kill the buffer quitting the window."
   (interactive)
-  (quit-window t))
+  (quit-window t)
+  (when (y-or-n-p "Kill all pass entry buffers? ")
+    (dolist (buf (buffer-list))
+      (with-current-buffer buf
+        (when (eq major-mode 'pass-view-mode)
+          (kill-buffer buf))))))
 
 (defun pass-next-entry ()
   "Move point to the next entry found."
