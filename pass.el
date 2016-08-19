@@ -38,9 +38,6 @@
 (defvar pass-buffer-name "*Password-Store*"
   "Name of the pass buffer.")
 
-(defvar pass-mode-hook nil
-  "Mode hook for `pass-mode'.")
-
 (defvar pass-mode-map
   (let ((map (make-sparse-keymap)))
     (define-key map (kbd "n") #'pass-next-entry)
@@ -76,17 +73,12 @@
   "Face for displaying password-store directory names."
   :group 'pass)
 
-(defun pass-mode ()
+(define-derived-mode pass-mode nil "Password-Store"
   "Major mode for editing password-stores.
 
 \\{pass-mode-map}"
-  (kill-all-local-variables)
-  (setq major-mode 'pass-mode
-        mode-name 'Password-Store
-        default-directory (password-store-dir))
-  (read-only-mode)
-  (use-local-map pass-mode-map)
-  (run-hooks 'pass-mode-hook))
+  (setq default-directory (password-store-dir))
+  (read-only-mode))
 
 (defun pass-setup-buffer ()
   "Setup the password-store buffer."
