@@ -195,7 +195,7 @@ user input."
     (password-store-edit entry)))
 
 (defun pass-copy ()
-  "Visit the entry at point."
+  "Add the entry at point to kill ring."
   (interactive)
   (pass--with-closest-entry entry
     (password-store-copy entry)))
