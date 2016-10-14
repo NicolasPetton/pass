@@ -1,10 +1,10 @@
 ;;; pass.el --- Major mode for password-store.el -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2015  Nicolas Petton & Damien Cassou
+;; Copyright (C) 2015-2016  Nicolas Petton & Damien Cassou
 
 ;; Author: Nicolas Petton <petton.nicolas@gmail.com>
 ;;         Damien Cassou <damien@cassou.me>
-;; Version: 1.4
+;; Version: 1.5
 ;; GIT: https://github.com/NicolasPetton/pass
 ;; Package-Requires: ((emacs "24") (password-store "0.1") (f "0.17"))
 ;; Created: 09 Jun 2015
@@ -147,7 +147,7 @@ Similar to `save-excursion' but only restore the point."
   (declare (indent 1) (debug t))
   `(let ((,varname (pass-closest-entry)))
      (if ,varname
-         ,@body
+         (progn ,@body)
        (message "No entry at point"))))
 
 (defun pass-rename (new-name)
