@@ -4,6 +4,8 @@ A major-mode to manage your
 [password-store](http://passwordstore.org/) (pass) keychain.  The
 keychain entries are displayed in a directory-like structure.
 
+Canonical repository: https://petton.fr/git/nico/pass.
+
 ## Installing
 
 Use [melpa](https://melpa.org/).
