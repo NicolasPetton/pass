@@ -32,6 +32,15 @@ The following keybindings are available:
 - `RET` or `v`: Go to the entry at point
 - `q`: Quit pass
 
+## Pass in Emacs
+
+Users of this package may also be interested in functionality provided
+by other Emacs packages dealing with pass:
+
+- [password-store](https://git.zx2c4.com/password-store/tree/contrib/emacs/password-store.el): password store (pass) support;
+- [auth-password-store](https://github.com/DamienCassou/auth-password-store): integrate Emacs' auth-source with password-store;
+- [helm-pass](https://github.com/jabranham/helm-pass): helm interface for pass.
+
 ## Contributing
 
 Yes, please do! See [CONTRIBUTING][] for guidelines.
