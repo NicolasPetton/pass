@@ -4,7 +4,7 @@
 
 ;; Author: Nicolas Petton <petton.nicolas@gmail.com>
 ;;         Damien Cassou <damien@cassou.me>
-;; Version: 1.5
+;; Version: 1.6
 ;; GIT: https://github.com/NicolasPetton/pass
 ;; Package-Requires: ((emacs "24") (password-store "0.1") (f "0.17"))
 ;; Created: 09 Jun 2015
@@ -29,6 +29,7 @@
 
 ;;; Code:
 (require 'password-store)
+(require 'imenu)
 (require 'f)
 
 (defgroup pass '()
@@ -78,6 +79,7 @@
 
 \\{pass-mode-map}"
   (setq default-directory (password-store-dir))
+  (setq-local imenu-generic-expression '((nil "├──\\ \\(.*\\)" 1)))
   (read-only-mode))
 
 (defun pass-setup-buffer ()
