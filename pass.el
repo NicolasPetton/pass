@@ -1,10 +1,10 @@
 ;;; pass.el --- Major mode for password-store.el -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2015-2016  Nicolas Petton & Damien Cassou
+;; Copyright (C) 2015-2017  Nicolas Petton & Damien Cassou
 
 ;; Author: Nicolas Petton <petton.nicolas@gmail.com>
 ;;         Damien Cassou <damien@cassou.me>
-;; Version: 1.6
+;; Version: 1.7
 ;; GIT: https://github.com/NicolasPetton/pass
 ;; Package-Requires: ((emacs "24") (password-store "0.1") (f "0.17"))
 ;; Created: 09 Jun 2015
