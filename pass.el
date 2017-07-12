@@ -291,13 +291,13 @@ indented according to INDENT-LEVEL."
 If SUBDIR is nil, return the entries of `(password-store-dir)'."
   (unless subdir (setq subdir ""))
   (let ((path (f-join (password-store-dir) subdir)))
-    (delq nil
-          (if (f-directory? path)
-              (cons (f-filename path)
+    (if (f-directory? path)
+        (cons (f-filename path)
+              (delq nil
                     (mapcar 'pass--tree
-                            (f-entries path)))
-            (when (equal (f-ext path) "gpg")
-              (password-store--file-to-entry path))))))
+                            (f-entries path))))
+      (when (equal (f-ext path) "gpg")
+        (password-store--file-to-entry path)))))
 
 ;;; major mode for viewing entries
 
