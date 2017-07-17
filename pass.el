@@ -259,7 +259,7 @@ indented according to INDENT-LEVEL."
 
 (defun pass-entry-at-point ()
   "Return the `pass-entry' property at point."
-  (get-text-property (point) 'pass-entry))
+  (get-text-property (point-at-eol) 'pass-entry))
 
 (defun pass-directory-at-point ()
   "Return the `pass-directory' property at point."
@@ -268,11 +268,10 @@ indented according to INDENT-LEVEL."
 (defun pass-closest-entry ()
   "Return the closest entry in the current buffer, looking backward."
   (save-excursion
-    (unless (bobp)
-      (or (pass-entry-at-point)
-          (progn
-            (forward-line -1)
-            (pass-closest-entry))))))
+    (or (pass-entry-at-point)
+        (unless (bolp)
+          (forward-line -1)
+          (pass-closest-entry)))))
 
 (defun pass--goto-next (pred)
   "Move point to the next match of PRED."
