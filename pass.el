@@ -176,17 +176,17 @@ Similar to `save-excursion' but only restore the point."
       (pass-display-data))))
 
 (defun pass-insert ()
-  (interactive)
   "Insert an entry to the password-store.
 The password is read from user input."
+  (interactive)
   (call-interactively #'password-store-insert)
   (pass-update-buffer))
 
 (defun pass-insert-generated ()
-  (interactive)
   "Insert an entry to the password-store.
 Use a generated password instead of reading the password from
 user input."
+  (interactive)
   (call-interactively #'password-store-generate)
   (pass-update-buffer))
 
