@@ -242,13 +242,12 @@ the entries of the directory.  Add enough spaces so that each entry is
 indented according to INDENT-LEVEL."
   (let ((name (car directory))
         (items (cdr directory)))
-    (when (not (string= name ".git"))
-      (insert name)
-      (add-text-properties (point-at-bol) (point)
-                           `(face pass-mode-directory-face pass-directory ,name))
-      (newline)
-      (dolist (item items)
-        (pass-display-item item (1+ indent-level))))))
+    (insert name)
+    (add-text-properties (point-at-bol) (point)
+                         `(face pass-mode-directory-face pass-directory ,name))
+    (newline)
+    (dolist (item items)
+      (pass-display-item item (1+ indent-level)))))
 
 (defun pass-display-item-prefix (indent-level)
   "Display some indenting text according to INDENT-LEVEL."
@@ -291,10 +290,11 @@ If SUBDIR is nil, return the entries of `(password-store-dir)'."
   (unless subdir (setq subdir ""))
   (let ((path (f-join (password-store-dir) subdir)))
     (if (f-directory? path)
-        (cons (f-filename path)
-              (delq nil
-                    (mapcar 'pass--tree
-                            (f-entries path))))
+        (unless (string= (f-filename subdir) ".git")
+          (cons (f-filename path)
+                (delq nil
+                      (mapcar 'pass--tree
+                              (f-entries path)))))
       (when (equal (f-ext path) "gpg")
         (password-store--file-to-entry path)))))
 
