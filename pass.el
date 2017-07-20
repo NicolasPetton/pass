@@ -175,12 +175,25 @@ Similar to `save-excursion' but only restore the point."
       (delete-region (point-min) (point-max))
       (pass-display-data))))
 
-(defun pass-insert ()
+(defun pass-insert (arg)
   "Insert an entry to the password-store.
-The password is read from user input."
-  (interactive)
-  (call-interactively #'password-store-insert)
-  (pass-update-buffer))
+The password is read from user input.
+
+When called with a prefix argument ARG, visit the entry file."
+  (interactive "P")
+  (if arg
+      (pass-insert-multiline)
+    (progn
+      (call-interactively #'password-store-insert)
+      (pass-update-buffer))))
+
+(defun pass-insert-multiline ()
+  "This function behaves similarly to `pass -m'.
+It creates an empty entry file, and visit it."
+  (let ((entry (format "%s.gpg" (read-string "Password entry: ")))
+        (default-directory (password-store-dir)))
+    (make-directory (file-name-directory entry) t)
+    (find-file (expand-file-name entry (password-store-dir)))))
 
 (defun pass-insert-generated ()
   "Insert an entry to the password-store.
