@@ -226,25 +226,40 @@ user input."
   (insert "Password-store directory:")
   (put-text-property (point-at-bol) (point) 'face 'pass-mode-header-face)
   (insert "\n\n")
-  (insert (format "%8s %-12s \t\t\t " (format "[%s]" (propertize "w" 'face 'font-lock-constant-face)) "copy"))
-  (insert (format "%8s %-12s \t\t\t " (format "[%s]" (propertize "v/RET" 'face 'font-lock-constant-face)) "view"))
-  (insert (format "%8s %-12s \t\t\t " (format "[%s]" (propertize "I" 'face 'font-lock-constant-face)) "generate"))
+  (pass--display-keybindings '((pass-copy . "Copy password")
+                               (pass-view . "View entry")
+                               (pass-update-buffer . "Update")))
   (insert "\n")
-  (insert (format "%8s %-12s \t\t\t " (format "[%s]" (propertize "i" 'face 'font-lock-constant-face)) "insert"))
-  (insert (format "%8s %-12s \t\t\t " (format "[%s]" (propertize "k" 'face 'font-lock-constant-face)) "delete"))
-  (insert (format "%8s %-12s \t\t\t " (format "[%s]" (propertize "r" 'face 'font-lock-constant-face)) "rename"))
+  (pass--display-keybindings '((pass-insert . "Insert")
+                               (pass-next-entry . "Next")
+                               (describe-mode . "Help")))
   (insert "\n")
-  (insert (format "%8s %-12s \t\t\t " (format "[%s]" (propertize "n" 'face 'font-lock-constant-face)) "next"))
-  (insert (format "%8s %-12s \t\t\t " (format "[%s]" (propertize "p" 'face 'font-lock-constant-face)) "previous"))
+  (pass--display-keybindings '((pass-insert-generated . "Generate")
+                               (pass-prev-entry . "Previous")))
   (insert "\n")
-  (insert (format "%8s %-12s \t\t\t " (format "[%s]" (propertize "M-n" 'face 'font-lock-constant-face)) "next dir"))
-  (insert (format "%8s %-12s \t\t\t " (format "[%s]" (propertize "M-p" 'face 'font-lock-constant-face)) "prev dir"))
+  (pass--display-keybindings '((pass-rename . "Rename")
+                               (pass-next-directory . "Next dir")))
   (insert "\n")
-  (insert (format "%8s %-12s \t\t\t " (format "[%s]" (propertize "g" 'face 'font-lock-constant-face)) "update"))
-  (insert (format "%8s %-12s \t\t\t " (format "[%s]" (propertize "?" 'face 'font-lock-constant-face)) "help"))
-  (insert (format "%8s %-12s \t\t\t " (format "[%s]" (propertize "q" 'face 'font-lock-constant-face)) "quit"))
+  (pass--display-keybindings '((pass-kill . "Delete")
+                               (pass-prev-directory . "Previous dir")))
   (newline)
   (newline))
+
+(defun pass--display-keybindings (bindings)
+  "Display the keybinding in each item of BINDINGS.
+BINDINGS is an alist of bindings."
+  (mapc (lambda (pair)
+          (pass--display-keybinding (car pair) (cdr pair)))
+        bindings))
+
+(defun pass--display-keybinding (command label)
+  "Insert the associated keybinding for COMMAND with LABEL."
+  (insert (format "%8s %-12s \t "
+                  (format "%s"
+                          (propertize (substitute-command-keys
+                                       (format "<\\[%s]>" (symbol-name command)))
+                                      'face 'font-lock-constant-face))
+                  label)))
 
 (defun pass-display-item (item &optional indent-level)
   "Display the directory or entry ITEM into the current buffer.
