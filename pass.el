@@ -427,7 +427,7 @@ If SUBDIR is nil, return the entries of `(password-store-dir)'."
    (substitute-command-keys
     "Press <\\[pass-view-toggle-password]> to display & edit the password")))
 
-(add-to-list 'auto-mode-alist '("\\.password-store/" . pass-view-mode))
+(add-to-list 'auto-mode-alist '("\\.password-store/.*\\.gpg\\'" . pass-view-mode))
 
 (provide 'pass)
 ;;; pass.el ends here
