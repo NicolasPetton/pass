@@ -213,7 +213,7 @@ user input."
   "Visit the entry at point."
   (interactive)
   (pass--with-closest-entry entry
-    (password-store-edit entry)))
+    (find-file (concat (f-join (password-store-dir) entry) ".gpg"))))
 
 (defun pass-copy ()
   "Add the entry at point to kill ring."
