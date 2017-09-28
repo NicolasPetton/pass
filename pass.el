@@ -4,9 +4,9 @@
 
 ;; Author: Nicolas Petton <petton.nicolas@gmail.com>
 ;;         Damien Cassou <damien@cassou.me>
-;; Version: 1.7
+;; Version: 1.8
 ;; GIT: https://github.com/NicolasPetton/pass
-;; Package-Requires: ((emacs "24") (password-store "0.1") (f "0.17"))
+;; Package-Requires: ((emacs "24.3") (password-store "0.1") (password-store-otp "0.1.5") (f "0.17"))
 ;; Created: 09 Jun 2015
 ;; Keywords: password-store, password, keychain
 
@@ -32,6 +32,7 @@
 (require 'imenu)
 (require 'button)
 (require 'f)
+(require 'subr-x)
 
 (defgroup pass '()
   "Major mode for password-store."
@@ -60,6 +61,7 @@
     (define-key map (kbd "w") #'pass-copy)
     (define-key map (kbd "v") #'pass-view)
     (define-key map (kbd "r") #'pass-rename)
+    (define-key map (kbd "o") #'pass-otp-options)
     (define-key map (kbd "RET") #'pass-view)
     (define-key map (kbd "q") #'pass-quit)
     map)
@@ -237,14 +239,15 @@ user input."
   (when pass-show-keybindings
     (pass--display-keybindings '((pass-copy . "Copy password")
                                  (pass-view . "View entry")
-                                 (pass-update-buffer . "Update")))
+                                 (pass-otp-options . "OTP Support")))
     (insert "\n")
     (pass--display-keybindings '((pass-insert . "Insert")
                                  (pass-next-entry . "Next")
-                                 (describe-mode . "Help")))
+                                 (pass-update-buffer . "Update")))
     (insert "\n")
     (pass--display-keybindings '((pass-insert-generated . "Generate")
-                                 (pass-prev-entry . "Previous")))
+                                 (pass-prev-entry . "Previous")
+                                 (describe-mode . "Help")))
     (insert "\n")
     (pass--display-keybindings '((pass-rename . "Rename")
                                  (pass-next-directory . "Next dir")))
@@ -342,6 +345,56 @@ indented according to INDENT-LEVEL."
           (forward-line -1)
           (pass-closest-entry)))))
 
+(defun pass-otp-options (option)
+  "Dispatch otp actions depending on user OPTION input.
+Display help message with OTP functionality options."
+  (interactive
+   (list
+    (read-char-choice "[i] Insert, [a] Append, [s] Append from screenshot, [o] Copy token, [u] Copy URI, or [C-g] to abort: "
+                      '(?i ?a ?s ?o ?u))))
+  (unless (require 'password-store-otp nil t)
+    (user-error "You cannot do this without installing `password-store-otp' first"))
+  (pcase option
+    (?i (pass-otp-insert))
+    (?a (pass-otp-append))
+    (?s (pass-otp-from-screenshot))
+    (?o (pass-otp-token-copy))
+    (?u (pass-otp-uri-copy))))
+
+(defun pass-otp-token-copy ()
+  "Add OTP Token from closest entry to kill ring."
+  (interactive)
+  (pass--with-closest-entry entry
+    (password-store-otp-token-copy entry)))
+
+(defun pass-otp-uri-copy ()
+  "Add OTP URI from closest entry to kill ring."
+  (interactive)
+  (pass--with-closest-entry entry
+    (password-store-otp-uri-copy entry)))
+
+(defun pass-otp-insert ()
+  "Insert an OTP URI entry to the password-store.
+The password is read from user input."
+  (interactive)
+  (call-interactively #'password-store-otp-insert)
+  (pass-update-buffer))
+
+(defun pass-otp-append ()
+  "Append an OTP URI to an existing entry in the password-store.
+The password is read from user input."
+  (interactive)
+  (pass--with-closest-entry entry
+    (password-store-otp-append entry (read-passwd "OTP URI: " t)))
+  (pass-update-buffer))
+
+(defun pass-otp-from-screenshot ()
+  "Append an OTP URI taken from a screenshot to an existing entry in the password-store."
+  (interactive)
+  (pass--with-closest-entry entry
+    (password-store-otp-append-from-image entry))
+  (pass-update-buffer))
+
 (defun pass--goto-next (pred)
   "Move point to the next match of PRED."
   (forward-line)
@@ -378,6 +431,17 @@ If SUBDIR is nil, return the entries of `(password-store-dir)'."
     (define-key map (kbd "C-c C-c") #'pass-view-toggle-password)
     (define-key map (kbd "C-c C-w") #'pass-view-copy-password)
     map))
+(make-variable-buffer-local 'pass-view-mode-map)
+
+(defun pass-view-entry-name (&optional buffer)
+  "Return the entry name for BUFFER.
+This function only works when `pass-view-mode' is enabled."
+  (with-current-buffer (or buffer (current-buffer))
+    (when (eq major-mode 'pass-view-mode)
+      (f-no-ext (replace-regexp-in-string
+                 (format "^%s/" (f-expand (password-store-dir)))
+                 ""
+                 buffer-file-name)))))
 
 (defun pass-view-toggle-password ()
   "Enable or disable password hiding."
@@ -413,6 +477,87 @@ If SUBDIR is nil, return the entries of `(password-store-dir)'."
     (remove-text-properties (point-min) (line-end-position)
                             '(display nil))))
 
+(defun pass-view-copy-token ()
+  "Copy current `pass-view' buffer's OTP token into clipboard."
+  (interactive)
+  (when-let (entry-name (pass-view-entry-name))
+    (password-store-otp-token-copy entry-name)))
+
+(defun pass-view-qrcode ()
+  "Open a new buffer that displays a QR Code for the current entry."
+  (interactive)
+  (when-let (entry-name (pass-view-entry-name))
+    (let ((qrcode-buffer (get-buffer-create "*pass-view-qrcode*")))
+      (with-current-buffer qrcode-buffer
+        (fundamental-mode)  ;; Return buffer *back* to fundamental, in case it isn't already.
+        (erase-buffer)
+        (insert (password-store-otp-qrcode entry-name "SVG"))
+        (image-mode)
+        (local-set-key (kbd "q") 'kill-this-buffer))
+      (switch-to-buffer-other-window qrcode-buffer))))
+
+(defun pass-view--otp-remaining-secs ()
+  "Return a string with the remaining countdown base 30."
+  (let* ((base 30)
+         (remaining (- base (% (truncate (time-to-seconds (current-time)))
+                               base)))
+         (remaining-str (number-to-string remaining)))
+    (if (< remaining 10)  ;; leftpad-ing
+        (concat "0" remaining-str)
+      remaining-str)))
+
+(defun pass-view--set-otp-header (token remaining-secs)
+  "Display OTP TOKEN and REMAINING-SECS in Header Line."
+  (let ((otp-data (concat (propertize " " 'display '((space :align-to 0)))
+                          (propertize "OTP: " 'face 'pass-mode-header-face)
+                          token " - " remaining-secs "s remaining"))
+        (key-binding (concat (propertize (substitute-command-keys
+                                          (format "<\\[%s]>" "pass-view-copy-token"))
+                                         'face 'font-lock-constant-face)
+                             " Copy token")))
+    (setq header-line-format (concat otp-data "    " key-binding))
+    (force-mode-line-update)))
+
+(defun pass-view--has-otp-p ()
+  "Return t-ish value if there's an OTP URI in the current buffer.
+nil otherwise."
+  (save-excursion
+    (goto-char (point-min))
+    (search-forward "otpauth://" nil t)))
+
+(defun pass-view--otp-counter (buffer &optional last-token force-create)
+  "Reload BUFFER's OTP token and countdown, using LAST-TOKEN if any, and if FORCE-CREATE, build Header Line from scratch."
+  (when (buffer-live-p buffer)
+    (with-current-buffer buffer
+      (when (or header-line-format force-create)
+        (let* ((remaining-secs (pass-view--otp-remaining-secs))
+               (token (if (or (not last-token)
+                              (string= remaining-secs "30"))
+                          (password-store-otp-token (pass-view-entry-name buffer))
+                        last-token)))
+          (pass-view--set-otp-header token remaining-secs)
+          (run-at-time 1 nil #'pass-view--otp-counter buffer token))))))
+
+(defun pass-view--prepare-otp ()
+  "Start an OTP token/remaining secs counter in current buffer.
+This function also binds a couple of handy OTP related key-bindings to
+`pass-mode-map'."
+  (when (and (require 'password-store-otp nil t)
+             (pass-view--has-otp-p))
+    ;; Build OTP counter
+    (pass-view--otp-counter (current-buffer) nil t)
+    ;; Rebuild header after saving.
+    (add-hook 'after-save-hook
+              #'(lambda ()
+                  (if (pass-view--has-otp-p)
+                      (pass-view--otp-counter (current-buffer) nil t)
+                    ;; Remove header line
+                    (setq header-line-format nil)))
+              t t)
+    ;; Define a couple of OTP helper shortcuts
+    (define-key pass-view-mode-map (kbd "C-c C-o") #'pass-view-copy-token)
+    (define-key pass-view-mode-map (kbd "C-c C-q") #'pass-view-qrcode)))
+
 (defvar pass-view-font-lock-keywords '("^[^\s\n]+:" . 'font-lock-keyword-face)
   "Font lock keywords for ‘pass-view-mode’.")
 
@@ -421,6 +566,7 @@ If SUBDIR is nil, return the entries of `(password-store-dir)'."
 
 \\{pass-view-mode-map}"
   (pass-view-toggle-password)
+  (pass-view--prepare-otp)
   (setq-local font-lock-defaults '(pass-view-font-lock-keywords))
   (font-lock-mode 1)
   (message
