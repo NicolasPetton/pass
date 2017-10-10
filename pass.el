@@ -87,8 +87,24 @@
 
 \\{pass-mode-map}"
   (setq default-directory (password-store-dir))
-  (setq-local imenu-generic-expression '((nil "├──\\ \\(.*\\)" 1)))
+  (setq imenu-prev-index-position-function
+        'pass--imenu-prev-index-position-function)
+  (setq imenu-extract-index-name-function
+        'pass--imenu-extract-index-name-function)
   (read-only-mode))
+
+(defun pass--imenu-prev-index-position-function ()
+  "Move point to previous line in current buffer.
+This function is used as a value for
+`imenu-prev-index-position-function'."
+  (pass-prev-entry)
+  (not (bobp)))
+
+(defun pass--imenu-extract-index-name-function ()
+  "Return imenu name for pass entry at point.
+This function is used as a value for
+`imenu-extract-index-name-function'."
+  (pass-entry-at-point))
 
 (defun pass-setup-buffer ()
   "Setup the password-store buffer."
