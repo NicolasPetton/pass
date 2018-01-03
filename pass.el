@@ -82,7 +82,7 @@
   "Face for displaying password-store directory names."
   :group 'pass)
 
-(define-derived-mode pass-mode nil "Password-Store"
+(define-derived-mode pass-mode fundamental-mode "Password-Store"
   "Major mode for editing password-stores.
 
 \\{pass-mode-map}"
