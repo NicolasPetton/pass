@@ -476,7 +476,8 @@ This function only works when `pass-view-mode' is enabled."
   (interactive)
   (save-excursion
     (goto-char (point-min))
-    (copy-region-as-kill (point) (line-end-position))))
+    (copy-region-as-kill (point) (line-end-position))
+    (message "Password copied to kill ring.")))
 
 (defun pass-view-mask-password ()
   "Mask the password of the current buffer."
