@@ -584,7 +584,7 @@ This function also binds a couple of handy OTP related key-bindings to
 \\{pass-view-mode-map}"
   (pass-view-toggle-password)
   (pass-view--prepare-otp)
-  (setq-local font-lock-defaults '(pass-view-font-lock-keywords))
+  (setq-local font-lock-defaults '(pass-view-font-lock-keywords t))
   (font-lock-mode 1)
   (message
    (substitute-command-keys
