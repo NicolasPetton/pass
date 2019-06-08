@@ -434,7 +434,8 @@ If SUBDIR is nil, return the entries of `(password-store-dir)'."
                 (delq nil
                       (mapcar 'pass--tree
                               (f-entries path)))))
-      (when (equal (f-ext path) "gpg")
+      (when (and (equal (f-ext path) "gpg")
+                 (not (backup-file-name-p path)))
         (password-store--file-to-entry path)))))
 
 ;;; major mode for viewing entries
