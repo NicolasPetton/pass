@@ -30,6 +30,7 @@ The following keybindings are available:
 - `?`: Help
 - `g`: Update the password-store buffer
 - `RET` or `v`: Go to the entry at point
+- `j`: Jump to a given entry
 - `q`: Quit pass
 
 #### 2FA / OTP Support
@@ -77,7 +78,7 @@ Yes, please do! See [CONTRIBUTING][] for guidelines.
 
 ## License
 
-See [LICENSE][]. Copyright (c) 2015-2016 Nicolas Petton & Damien Cassou.
+See [LICENSE][]. Copyright (c) 2015-2019 Nicolas Petton & Damien Cassou.
 
 
 [CONTRIBUTING]: ./CONTRIBUTING.md
