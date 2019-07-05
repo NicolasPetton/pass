@@ -159,21 +159,6 @@ Similar to `save-excursion' but only restore the point."
   (interactive)
   (pass--goto-prev #'pass-entry-at-point))
 
-(defun pass--drop-dir-headers (tree)
-  "Drop all directory headers from TREE.
-TREE is a list as returned by `pass--tree' and it is not modified.
-This returns a flat list with just the entries at TREE."
-  (let (entries)
-    (dolist (entry (cdr tree))
-      (if (atom entry)
-          (push entry entries)
-        (setq entries (append (pass--drop-dir-headers entry) entries))))
-    (nreverse entries)))
-
-(defun pass--entries ()
-  "Collect all entries in the pass buffer."
-  (pass--drop-dir-headers (pass--tree nil)))
-
 (defun pass--target-entry-pos (target)
   "Return position of TARGET entry or nil if it doesn't exist."
   (save-excursion
@@ -193,7 +178,8 @@ specified as `foo/bar'.
 When called interactively, prompt users with completion using
 all entries in the pass buffer."
   (interactive
-   (list (completing-read "Jump to entry: " (pass--entries) nil 'match)))
+   (list (completing-read "Jump to entry: "
+                          (password-store-list) nil 'match)))
   (let ((entry-pos (pass--target-entry-pos entry)))
     (if entry-pos
         (goto-char entry-pos)
