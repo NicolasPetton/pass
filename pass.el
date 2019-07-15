@@ -1,6 +1,6 @@
 ;;; pass.el --- Major mode for password-store.el -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2015-2017  Nicolas Petton & Damien Cassou
+;; Copyright (C) 2015-2019  Nicolas Petton & Damien Cassou
 
 ;; Author: Nicolas Petton <petton.nicolas@gmail.com>
 ;;         Damien Cassou <damien@cassou.me>
@@ -58,6 +58,7 @@
     (define-key map (kbd "g") #'pass-update-buffer)
     (define-key map (kbd "i") #'pass-insert)
     (define-key map (kbd "I") #'pass-insert-generated)
+    (define-key map (kbd "j") #'pass-goto-entry)
     (define-key map (kbd "w") #'pass-copy)
     (define-key map (kbd "v") #'pass-view)
     (define-key map (kbd "r") #'pass-rename)
@@ -158,6 +159,33 @@ Similar to `save-excursion' but only restore the point."
   (interactive)
   (pass--goto-prev #'pass-entry-at-point))
 
+(defun pass--target-entry-pos (target)
+  "Return position of TARGET entry or nil if it doesn't exist."
+  (save-excursion
+    (goto-char (point-min))
+    (pass--goto-next (lambda () (equal (pass-entry-at-point) target)))
+    (unless (eobp)
+      (point))))
+
+(defun pass-goto-entry (entry)
+  "Move point to ENTRY and return its position.
+If ENTRY doesn't exist in the buffer, then preserve point and return nil.
+
+Note that ENTRY must reflect its deep level in the directory structure;
+for instance, an entry `bar' inside the subdirectory `foo', must be
+specified as `foo/bar'.
+
+When called interactively, prompt users with completion using
+all entries in the pass buffer."
+  (interactive
+   (list (completing-read "Jump to entry: "
+                          (password-store-list) nil 'match)))
+  (let ((entry-pos (pass--target-entry-pos entry)))
+    (if entry-pos
+        (goto-char entry-pos)
+      (message "No entry matches %s in current directory" entry)
+      nil)))
+
 (defun pass-next-directory ()
   "Move point to the next directory found."
   (interactive)
@@ -255,7 +283,7 @@ user input."
   (when pass-show-keybindings
     (pass--display-keybindings '((pass-copy . "Copy password")
                                  (pass-view . "View entry")
-                                 (pass-otp-options . "OTP Support")))
+                                 (pass-goto-entry . "Jump to Entry")))
     (insert "\n")
     (pass--display-keybindings '((pass-insert . "Insert")
                                  (pass-next-entry . "Next")
@@ -263,10 +291,11 @@ user input."
     (insert "\n")
     (pass--display-keybindings '((pass-insert-generated . "Generate")
                                  (pass-prev-entry . "Previous")
-                                 (describe-mode . "Help")))
+                                 (pass-otp-options . "OTP Support")))
     (insert "\n")
     (pass--display-keybindings '((pass-rename . "Rename")
-                                 (pass-next-directory . "Next dir")))
+                                 (pass-next-directory . "Next dir")
+                                 (describe-mode . "Help")))
     (insert "\n")
     (pass--display-keybindings '((pass-kill . "Delete")
                                  (pass-prev-directory . "Previous dir")))
@@ -297,7 +326,7 @@ BINDINGS is an alist of bindings."
 
 (defun pass--display-keybinding (command label)
   "Insert the associated keybinding for COMMAND with LABEL."
-  (insert (format "%8s %-12s \t "
+  (insert (format "%8s %-13s \t "
                   (format "%s"
                           (propertize (substitute-command-keys
                                        (format "<\\[%s]>" (symbol-name command)))
