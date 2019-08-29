@@ -25,8 +25,13 @@ The following keybindings are available:
 - `M-n`: Go to the next directory
 - `M-p`: Go to the previous directory
 - `k`: Remove the entry at point
+- `w`: Copy password of the entry at point to the kill ring
+- `b`: Copy username of the entry at point to the kill ring
+- `u`: Copy url of the entry at point to the kill ring
+- `f`: Copy a given secret field of the entry at point to the kill ring
+- `U`: Browse to the url of the entry at point with the default web browser
 - `s`: Trigger iSearch
-- `r`: Trigger iSearch (backward)
+- `r`: Rename the entry at point
 - `?`: Help
 - `g`: Update the password-store buffer
 - `RET` or `v`: Go to the entry at point
