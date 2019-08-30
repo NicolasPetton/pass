@@ -671,7 +671,11 @@ This function also binds a couple of handy OTP related key-bindings to
    (substitute-command-keys
     "Press <\\[pass-view-toggle-password]> to display & edit the password")))
 
-(add-to-list 'auto-mode-alist '("\\.password-store/.*\\.gpg\\'" . pass-view-mode))
+(add-to-list 'auto-mode-alist
+             (cons
+              (format "%s/.*\\.gpg\\'"
+                      (expand-file-name (password-store-dir)))
+              'pass-view-mode))
 
 (provide 'pass)
 ;;; pass.el ends here
