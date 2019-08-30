@@ -4,9 +4,9 @@
 
 ;; Author: Nicolas Petton <petton.nicolas@gmail.com>
 ;;         Damien Cassou <damien@cassou.me>
-;; Version: 1.8
+;; Version: 1.9
 ;; GIT: https://github.com/NicolasPetton/pass
-;; Package-Requires: ((emacs "24.3") (password-store "0.1") (password-store-otp "0.1.5") (f "0.17"))
+;; Package-Requires: ((emacs "25") (password-store "2.1.0") (password-store-otp "0.1.5") (f "0.17"))
 ;; Created: 09 Jun 2015
 ;; Keywords: password-store, password, keychain
 
@@ -43,6 +43,11 @@
   :group 'pass
   :type 'boolean)
 
+(defcustom pass-username-field "username"
+  "Field name used in the files to indicate an username."
+  :group 'pass
+  :type 'string)
+
 (defvar pass-buffer-name "*Password-Store*"
   "Name of the pass buffer.")
 
@@ -60,6 +65,10 @@
     (define-key map (kbd "I") #'pass-insert-generated)
     (define-key map (kbd "j") #'pass-goto-entry)
     (define-key map (kbd "w") #'pass-copy)
+    (define-key map (kbd "b") #'pass-copy-username)
+    (define-key map (kbd "f") #'pass-copy-field)
+    (define-key map (kbd "u") #'pass-copy-url)
+    (define-key map (kbd "U") #'pass-browse-url)
     (define-key map (kbd "v") #'pass-view)
     (define-key map (kbd "r") #'pass-rename)
     (define-key map (kbd "o") #'pass-otp-options)
@@ -262,10 +271,40 @@ user input."
     (find-file (concat (f-join (password-store-dir) entry) ".gpg"))))
 
 (defun pass-copy ()
-  "Add the entry at point to kill ring."
+  "Add the password of entry at point to kill ring."
   (interactive)
   (pass--with-closest-entry entry
     (password-store-copy entry)))
+
+(defun pass--copy-field (field)
+  "Add FIELD of entry at point to kill ring."
+  (pass--with-closest-entry entry
+    (let* ((inhibit-message t)
+           (parsed-entries (password-store-parse-entry entry)))
+      (unless (assoc field parsed-entries)
+        (user-error "Field `%s' not in  %s" field entry))
+      (password-store-copy-field entry field))))
+
+(defun pass-copy-field (field)
+  "Add FIELD of entry at point to kill ring.
+
+When called interactively, prompt users for field with completion
+using all fields in the entry."
+  (interactive
+   (pass--with-closest-entry entry
+     (list (password-store-read-field entry))))
+  (if (equal field "secret") (pass-copy)
+    (pass--copy-field field)))
+
+(defun pass-copy-username ()
+  "Add username of entry at point to kill ring."
+  (interactive)
+  (pass--copy-field pass-username-field))
+
+(defun pass-copy-url ()
+  "Add url of entry at point to kill ring."
+  (interactive)
+  (pass--copy-field password-store-url-field))
 
 (defun pass-display-data ()
   "Display the password-store data into the current buffer."
@@ -282,8 +321,13 @@ user input."
   (insert "\n\n")
   (when pass-show-keybindings
     (pass--display-keybindings '((pass-copy . "Copy password")
-                                 (pass-view . "View entry")
-                                 (pass-goto-entry . "Jump to Entry")))
+                                 (pass-copy-username . "Copy username")
+                                 (pass-copy-url . "Copy url")))
+    (insert "\n")
+    (pass--display-keybindings '((pass-copy-field . "Copy field")
+                                 (pass-goto-entry . "Jump to Entry")
+                                 (pass-browse-url . "Browse url")))
+                                 
     (insert "\n")
     (pass--display-keybindings '((pass-insert . "Insert")
                                  (pass-next-entry . "Next")
@@ -295,10 +339,11 @@ user input."
     (insert "\n")
     (pass--display-keybindings '((pass-rename . "Rename")
                                  (pass-next-directory . "Next dir")
-                                 (describe-mode . "Help")))
+                                 (pass-view . "View entry")))
     (insert "\n")
     (pass--display-keybindings '((pass-kill . "Delete")
-                                 (pass-prev-directory . "Previous dir")))
+                                 (pass-prev-directory . "Previous dir")
+                                 (describe-mode . "Help")))
     (newline)
     (newline)))
 
@@ -604,6 +649,12 @@ This function also binds a couple of handy OTP related key-bindings to
     ;; Define a couple of OTP helper shortcuts
     (define-key pass-view-mode-map (kbd "C-c C-o") #'pass-view-copy-token)
     (define-key pass-view-mode-map (kbd "C-c C-q") #'pass-view-qrcode)))
+
+(defun pass-browse-url ()
+  "Browse URL in entry at point."
+  (interactive)
+  (pass--with-closest-entry entry
+    (password-store-url entry)))
 
 (defvar pass-view-font-lock-keywords '("^[^\s\n]+:" . 'font-lock-keyword-face)
   "Font lock keywords for ‘pass-view-mode’.")
