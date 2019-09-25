@@ -1,10 +1,13 @@
 # pass
 
+[![Build Status](https://drone.petton.fr/api/badges/nico/pass/status.svg)](https://drone.petton.fr/nico/pass)
+[![MELPA](https://melpa.org/packages/pass-badge.svg)](https://melpa.org/#/pass)
+
 A major-mode to manage your
 [password-store](http://passwordstore.org/) (pass) keychain.  The
 keychain entries are displayed in a directory-like structure.
 
-Canonical repository: https://gitlab.petton.fr/nico/pass.
+Canonical repository: https://gitea.petton.fr/nico/pass
 
 ## Installing
 
