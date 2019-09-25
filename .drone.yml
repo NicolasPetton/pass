@@ -10,7 +10,6 @@ steps:
   image: ubuntu:latest
   commands:
   - apt-get update
-  - apt-get install -y coreutils make gnutls-bin emacs-nox nodejs npm
-  - make env
-  - make info
-  - make check
+  - apt-get install -y coreutils make gnutls-bin emacs-nox npm
+  - make dependencies
+  - make test
