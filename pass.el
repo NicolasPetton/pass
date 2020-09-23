@@ -48,6 +48,11 @@
   :group 'pass
   :type 'string)
 
+(defcustom pass-username-fallback-on-filename nil
+  "Whether the entry's filename should be used as a fallback for the username field."
+  :group 'pass
+  :type 'boolean)
+
 (defvar pass-buffer-name "*Password-Store*"
   "Name of the pass buffer.")
 
@@ -297,9 +302,19 @@ using all fields in the entry."
     (pass--copy-field field)))
 
 (defun pass-copy-username ()
-  "Add username of entry at point to kill ring."
+  "Add username of entry at point to kill ring.
+
+If the entry does not have a username field/value within the entry, and if
+`pass-username-fallback-on-filename' is non-nil, copy the entry name instead."
   (interactive)
-  (pass--copy-field pass-username-field))
+  (condition-case err
+      (pass--copy-field pass-username-field)
+    (user-error
+     (if (not pass-username-fallback-on-filename)
+         (signal (car err) (cdr err))) ;; rethrow
+     (pass--with-closest-entry entry
+       (let ((entry-name (file-name-nondirectory entry)))
+         (password-store--save-field-in-kill-ring entry entry-name "username"))))))
 
 (defun pass-copy-url ()
   "Add url of entry at point to kill ring."
@@ -327,7 +342,7 @@ using all fields in the entry."
     (pass--display-keybindings '((pass-copy-field . "Copy field")
                                  (pass-goto-entry . "Jump to Entry")
                                  (pass-browse-url . "Browse url")))
-                                 
+
     (insert "\n")
     (pass--display-keybindings '((pass-insert . "Insert")
                                  (pass-next-entry . "Next")
