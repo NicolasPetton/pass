@@ -41,6 +41,24 @@ The following keybindings are available:
 - `j`: Jump to a given entry
 - `q`: Quit pass
 
+#### Configuration
+
+##### `pass-username-fallback-on-filename`
+
+Some applications/extensions rely on a password store structure that
+exposes the username as the entry name, i.e:
+
+```
+example.com/
+  john@doe.com
+```
+
+If `pass-username-fallback-on-filename` is non-nil, the copy username
+command will still try to find a `password` field within the entry but
+fallback to the entry name if the field isn't found. In the example
+above, `john@doe.com` will be used in place (unless the entry does
+contain a `password` field).
+
 #### 2FA / OTP Support
 
 If you have the [`pass-otp`](https://github.com/tadfisher/pass-otp) extension
