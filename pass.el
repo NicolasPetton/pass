@@ -62,6 +62,7 @@
     (define-key map (kbd "p") #'pass-prev-entry)
     (define-key map (kbd "M-n") #'pass-next-directory)
     (define-key map (kbd "M-p") #'pass-prev-directory)
+    (define-key map (kbd "e") #'pass-edit)
     (define-key map (kbd "k") #'pass-kill)
     (define-key map (kbd "s") #'isearch-forward)
     (define-key map (kbd "?") #'describe-mode)
@@ -225,6 +226,13 @@ all entries in the pass buffer."
     (password-store-rename entry new-name)
     (pass-update-buffer)))
 
+(defun pass-edit ()
+  "Edit the entry at point."
+  (interactive)
+  (pass--with-closest-entry entry
+    (when (yes-or-no-p (format "Do you want edit the entry %s? " entry))
+      (password-store-edit entry))))
+
 (defun pass-kill ()
   "Remove the entry at point."
   (interactive)
@@ -359,6 +367,8 @@ If the entry does not have a username field/value within the entry, and if
     (pass--display-keybindings '((pass-kill . "Delete")
                                  (pass-prev-directory . "Previous dir")
                                  (describe-mode . "Help")))
+    (insert "\n")
+    (pass--display-keybindings '((pass-edit . "Edit")))
     (newline)
     (newline)))
 
