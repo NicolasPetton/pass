@@ -681,7 +681,7 @@ This function also binds a couple of handy OTP related key-bindings to
   (pass--with-closest-entry entry
     (password-store-url entry)))
 
-(defvar pass-view-font-lock-keywords '("^[^\s\n]+:" . 'font-lock-keyword-face)
+(defvar pass-view-font-lock-keywords '("\\(^[^:\t\n]+:\\) " 1 'font-lock-keyword-face)
   "Font lock keywords for ‘pass-view-mode’.")
 
 (define-derived-mode pass-view-mode nil "Pass-View"
