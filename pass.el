@@ -87,6 +87,10 @@
   "Face for displaying the header of the pass buffer."
   :group 'pass)
 
+(defface pass-mode-keybinding-face '((t :inherit font-lock-constant-face))
+  "Face for displaying pass key bindings."
+  :group 'pass)
+
 (defface pass-mode-entry-face '((t . ()))
   "Face for displaying pass entry names."
   :group 'pass)
@@ -400,7 +404,7 @@ BINDINGS is an alist of bindings."
                   (format "%s"
                           (propertize (substitute-command-keys
                                        (format "<\\[%s]>" (symbol-name command)))
-                                      'face 'font-lock-constant-face))
+                                      'face 'pass-mode-keybinding-face))
                   label)))
 
 (defun pass-display-item (item &optional indent-level)
