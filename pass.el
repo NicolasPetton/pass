@@ -53,6 +53,12 @@
   :group 'pass
   :type 'boolean)
 
+(defcustom pass-suppress-confirmations nil
+  "Whether to suppress the yes-or-no confirmations for pass-edit, pass-kill and
+pass-quit."
+  :group 'pass
+  :type 'boolean)
+
 (defvar pass-buffer-name "*Password-Store*"
   "Name of the pass buffer.")
 
@@ -157,7 +163,8 @@ Similar to `save-excursion' but only restore the point."
 (defun pass-quit ()
   "Kill the buffer quitting the window."
   (interactive)
-  (when (y-or-n-p "Kill all pass entry buffers? ")
+  (when (or pass-suppress-confirmations
+             (y-or-n-p "Kill all pass entry buffers? "))
     (dolist (buf (buffer-list))
       (with-current-buffer buf
         (when (eq major-mode 'pass-view-mode)
@@ -230,14 +237,16 @@ all entries in the pass buffer."
   "Edit the entry at point."
   (interactive)
   (pass--with-closest-entry entry
-    (when (yes-or-no-p (format "Do you want edit the entry %s? " entry))
+    (when (or pass-suppress-confirmations
+               (yes-or-no-p (format "Do you want edit the entry %s? " entry)))
       (password-store-edit entry))))
 
 (defun pass-kill ()
   "Remove the entry at point."
   (interactive)
   (pass--with-closest-entry entry
-    (when (yes-or-no-p (format "Do you want remove the entry %s? " entry))
+    (when (or pass-suppress-confirmations
+               (yes-or-no-p (format "Do you want remove the entry %s? " entry)))
       (password-store-remove entry)
       (pass-update-buffer))))
 
