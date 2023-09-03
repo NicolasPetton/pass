@@ -104,7 +104,7 @@ Yes, please do! See [CONTRIBUTING][] for guidelines.
 
 ## License
 
-See [LICENSE][]. Copyright (c) 2015-2019 Nicolas Petton & Damien Cassou.
+See [LICENSE][]. Copyright (c) 2015-2023 Nicolas Petton & Damien Cassou.
 
 
 [CONTRIBUTING]: ./CONTRIBUTING.md
