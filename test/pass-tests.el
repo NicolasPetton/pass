@@ -1,6 +1,6 @@
 ;;; pass-tests.el --- Tests for pass.el
 
-;; Copyright (C) 2013 Damien Cassou
+;; Copyright (C) 2013-2023 Damien Cassou
 
 ;; Author: Damien Cassou <damien.cassou@gmail.com>
 

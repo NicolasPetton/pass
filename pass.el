@@ -1,6 +1,6 @@
 ;;; pass.el --- Major mode for password-store.el -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2015-2019  Nicolas Petton & Damien Cassou
+;; Copyright (C) 2015-2023  Nicolas Petton & Damien Cassou
 
 ;; Author: Nicolas Petton <petton.nicolas@gmail.com>
 ;;         Damien Cassou <damien@cassou.me>
