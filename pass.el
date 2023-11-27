@@ -634,7 +634,7 @@ This function only works when `pass-view-mode' is enabled."
                           token " - " remaining-secs "s remaining"))
         (key-binding (concat (propertize (substitute-command-keys
                                           (format "<\\[%s]>" "pass-view-copy-token"))
-                                         'face 'font-lock-constant-face)
+                                         'face 'pass-mode-keybinding-face)
                              " Copy token")))
     (setq header-line-format (concat otp-data "    " key-binding))
     (force-mode-line-update)))
