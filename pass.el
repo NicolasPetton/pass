@@ -562,14 +562,15 @@ This function only works when `pass-view-mode' is enabled."
 (defun pass-view-toggle-password ()
   "Enable or disable password hiding."
   (interactive)
-  (save-excursion
-    (goto-char (point-min))
-    (let ((buf-modified (buffer-modified-p)))
-      (if (string= (get-text-property (point) 'display)
-                   pass-view-mask)
-          (pass-view-unmask-password)
-        (pass-view-mask-password))
-      (set-buffer-modified-p buf-modified))))
+  (let (buffer-undo-list)
+    (save-excursion
+      (goto-char (point-min))
+      (let ((buf-modified (buffer-modified-p)))
+        (if (string= (get-text-property (point) 'display)
+                     pass-view-mask)
+            (pass-view-unmask-password)
+          (pass-view-mask-password))
+        (set-buffer-modified-p buf-modified)))))
 
 (defun pass-view-copy-password ()
   "Copy the password of the entry in the current buffer."
