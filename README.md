@@ -59,6 +59,11 @@ fallback to the entry name if the field isn't found. In the example
 above, `john@doe.com` will be used in place (unless the entry does
 contain a `password` field).
 
+##### `pass-suppress-confirmations`
+
+If `pass-suppress-confirmations` is non-nil, yes-or-no confirmations for sensitive
+operations like editing or removing a password will not occur.
+
 #### 2FA / OTP Support
 
 If you have the [`pass-otp`](https://github.com/tadfisher/pass-otp) extension
