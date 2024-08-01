@@ -6,7 +6,7 @@
 ;;         Damien Cassou <damien@cassou.me>
 ;; Version: 2.0.1
 ;; URL: https://github.com/NicolasPetton/pass
-;; Package-Requires: ((emacs "25") (password-store "1.7.4") (password-store-otp "0.1.5") (f "0.17"))
+;; Package-Requires: ((emacs "25") (password-store "1.7.4") (password-store-otp "0.1.0") (f "0.17"))
 ;; Created: 09 Jun 2015
 ;; Keywords: password-store, password, keychain
 
