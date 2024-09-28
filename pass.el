@@ -598,15 +598,17 @@ This function only works when `pass-view-mode' is enabled."
   (let ((inhibit-read-only t))
     (save-excursion
       (goto-char (point-min))
-      (set-text-properties (point-min) (line-end-position)
-                           `(display ,pass-view-mask)))))
+      (with-silent-modifications
+        (set-text-properties (point-min) (line-end-position)
+                             `(display ,pass-view-mask))))))
 
 (defun pass-view-unmask-password ()
   "Show the password in the current buffer."
   (save-excursion
     (goto-char (point-min))
-    (remove-text-properties (point-min) (line-end-position)
-                            '(display nil))))
+    (with-silent-modifications
+      (remove-text-properties (point-min) (line-end-position)
+                              '(display nil)))))
 
 (defun pass-view-copy-token ()
   "Copy current `pass-view' buffer's OTP token into clipboard."
