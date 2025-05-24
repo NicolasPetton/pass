@@ -29,6 +29,7 @@
 
 ;;; Code:
 (require 'password-store)
+(require 'password-store-otp)
 (require 'imenu)
 (require 'button)
 (require 'f)
@@ -49,7 +50,7 @@
   :type 'string)
 
 (defcustom pass-username-fallback-on-filename nil
-  "Whether the entry's filename should be used as a fallback for the username field."
+  "If non-nil use an entry's filename as a fallback for the username field."
   :group 'pass
   :type 'boolean)
 
@@ -351,7 +352,7 @@ If the entry does not have a username field/value within the entry, and if
 (defun pass-display-header ()
   "Display the header in to the current buffer."
   (insert "Password-store directory:")
-  (put-text-property (point-at-bol) (point) 'face 'pass-mode-header-face)
+  (put-text-property (line-end-position) (point) 'face 'pass-mode-header-face)
   (insert " ")
   (pass--display-keybindings-toggle)
   (insert "\n\n")
@@ -431,7 +432,7 @@ ITEM."
   "Display the password-store entry ENTRY into the current buffer."
   (let ((entry-name (f-filename entry)))
     (insert entry-name)
-    (add-text-properties (point-at-bol) (point)
+    (add-text-properties (line-beginning-position) (point)
                          `(face pass-mode-entry-face pass-entry ,entry))
     (newline)))
 
@@ -444,7 +445,7 @@ indented according to INDENT-LEVEL."
   (let ((name (car directory))
         (items (cdr directory)))
     (insert name)
-    (add-text-properties (point-at-bol) (point)
+    (add-text-properties (line-beginning-position) (point)
                          `(face pass-mode-directory-face pass-directory ,name))
     (newline)
     (dolist (item items)
@@ -459,7 +460,7 @@ indented according to INDENT-LEVEL."
 
 (defun pass-entry-at-point ()
   "Return the `pass-entry' property at point."
-  (get-text-property (point-at-eol) 'pass-entry))
+  (get-text-property (line-end-position) 'pass-entry))
 
 (defun pass-directory-at-point ()
   "Return the `pass-directory' property at point."
@@ -517,7 +518,7 @@ The password is read from user input."
   (pass-update-buffer))
 
 (defun pass-otp-from-screenshot ()
-  "Append an OTP URI taken from a screenshot to an existing entry in the password-store."
+  "Like `pass-otp-apped', but take the OTP URI from a screenshot."
   (interactive)
   (pass--with-closest-entry entry
     (password-store-otp-append-from-image entry))
@@ -659,7 +660,8 @@ nil otherwise."
     (search-forward "otpauth://" nil t)))
 
 (defun pass-view--otp-counter (buffer &optional last-token force-create)
-  "Reload BUFFER's OTP token and countdown, using LAST-TOKEN if any, and if FORCE-CREATE, build Header Line from scratch."
+  "Reload BUFFER's OTP token and countdown, using LAST-TOKEN if any.
+If FORCE-CREATE is non-nil, build Header Line from scratch."
   (when (buffer-live-p buffer)
     (with-current-buffer buffer
       (when (or header-line-format force-create)
