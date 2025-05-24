@@ -6,9 +6,9 @@
 ;;         Damien Cassou <damien@cassou.me>
 ;; Version: 2.0.1
 ;; URL: https://github.com/NicolasPetton/pass
-;; Package-Requires: ((emacs "25") (password-store "1.7.4") (password-store-otp "0.1.5") (f "0.17"))
+;; Package-Requires: ((emacs "25.1") (password-store "1.7.4") (password-store-otp "0.1.5") (f "0.17"))
 ;; Created: 09 Jun 2015
-;; Keywords: password-store, password, keychain
+;; Keywords: tools, files
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -54,8 +54,8 @@
   :type 'boolean)
 
 (defcustom pass-suppress-confirmations nil
-  "Whether to suppress the yes-or-no confirmations for pass-edit, pass-kill and
-pass-quit."
+  "If non-nil suppress yes-or-no confirmations for pass commands.
+Confirmation is suppressed for `pass-edit', `pass-kill' and `pass-quit'."
   :group 'pass
   :type 'boolean)
 
