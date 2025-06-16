@@ -306,8 +306,9 @@ user input."
 (defun pass--copy-field (field)
   "Add FIELD of entry at point to kill ring."
   (pass--with-closest-entry entry
-    (let* ((inhibit-message t)
-           (parsed-entries (password-store-parse-entry entry)))
+    (let ((parsed-entries
+           (let ((inhibit-message t))
+             (password-store-parse-entry entry))))
       (unless (assoc field parsed-entries)
         (user-error "Field `%s' not in  %s" field entry))
       (password-store-copy-field entry field))))
