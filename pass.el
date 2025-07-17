@@ -358,34 +358,50 @@ If the entry does not have a username field/value within the entry, and if
   (pass--display-keybindings-toggle)
   (insert "\n\n")
   (when pass-show-keybindings
-    (pass--display-keybindings '((pass-copy . "Copy password")
-                                 (pass-copy-username . "Copy username")
-                                 (pass-copy-url . "Copy url")))
-    (insert "\n")
-    (pass--display-keybindings '((pass-copy-field . "Copy field")
-                                 (pass-goto-entry . "Jump to Entry")
-                                 (pass-browse-url . "Browse url")))
-
-    (insert "\n")
-    (pass--display-keybindings '((pass-insert . "Insert")
-                                 (pass-next-entry . "Next")
-                                 (pass-update-buffer . "Update")))
-    (insert "\n")
-    (pass--display-keybindings '((pass-insert-generated . "Generate")
-                                 (pass-prev-entry . "Previous")
-                                 (pass-otp-options . "OTP Support")))
-    (insert "\n")
-    (pass--display-keybindings '((pass-rename . "Rename")
-                                 (pass-next-directory . "Next dir")
-                                 (pass-view . "View entry")))
-    (insert "\n")
-    (pass--display-keybindings '((pass-kill . "Delete")
-                                 (pass-prev-directory . "Previous dir")
-                                 (describe-mode . "Help")))
-    (insert "\n")
-    (pass--display-keybindings '((pass-edit . "Edit")))
-    (newline)
-    (newline)))
+    (let* ((r1-bindings '((pass-copy . "Copy password")
+                          (pass-copy-username . "Copy username")
+                          (pass-copy-url . "Copy url")))
+           (r2-bindings '((pass-copy-field . "Copy field")
+                          (pass-goto-entry . "Jump to Entry")
+                          (pass-browse-url . "Browse url")))
+           (r3-bindings '((pass-insert . "Insert")
+                          (pass-next-entry . "Next")
+                          (pass-update-buffer . "Update")))
+           (r4-bindings '((pass-insert-generated . "Generate")
+                          (pass-prev-entry . "Previous")
+                          (pass-otp-options . "OTP Support")))
+           (r5-bindings '((pass-rename . "Rename")
+                          (pass-next-directory . "Next dir")
+                          (pass-view . "View entry")))
+           (r6-bindings '((pass-kill . "Delete")
+                          (pass-prev-directory . "Previous dir")
+                          (describe-mode . "Help")))
+           (r7-bindings '((pass-edit . "Edit")))
+           (all-bindings (append r1-bindings r2-bindings r3-bindings
+                                 r4-bindings r5-bindings r6-bindings
+                                 r7-bindings))
+           (command-lengths (mapcar (lambda (desc)
+                                      (length
+                                       (substitute-command-keys
+                                        (format "<\\[%s]>"
+                                                (symbol-name (car desc))))))
+                                    all-bindings))
+           (padding (1+ (apply #'max command-lengths))))
+      (pass--display-keybindings r1-bindings padding)
+      (insert "\n")
+      (pass--display-keybindings r2-bindings padding)
+      (insert "\n")
+      (pass--display-keybindings r3-bindings padding)
+      (insert "\n")
+      (pass--display-keybindings r4-bindings padding)
+      (insert "\n")
+      (pass--display-keybindings r5-bindings padding)
+      (insert "\n")
+      (pass--display-keybindings r6-bindings padding)
+      (insert "\n")
+      (pass--display-keybindings r7-bindings padding)
+      (newline)
+      (newline))))
 
 (defun pass--display-keybindings-toggle ()
   "Display a button to toggle whether keybindings should be displayed."
@@ -402,16 +418,19 @@ If the entry does not have a username field/value within the entry, and if
        (list (custom-quote (symbol-value pass-show-keybindings))))
   (pass-update-buffer))
 
-(defun pass--display-keybindings (bindings)
+(defun pass--display-keybindings (bindings padding)
   "Display the keybinding in each item of BINDINGS.
-BINDINGS is an alist of bindings."
+BINDINGS is an alist of bindings.
+PADDING is the padding used when inserting key strings."
   (mapc (lambda (pair)
-          (pass--display-keybinding (car pair) (cdr pair)))
+          (pass--display-keybinding (car pair) (cdr pair) padding))
         bindings))
 
-(defun pass--display-keybinding (command label)
-  "Insert the associated keybinding for COMMAND with LABEL."
-  (insert (format "%8s %-13s \t "
+(defun pass--display-keybinding (command label padding)
+  "Insert the associated keybinding for COMMAND with LABEL.
+
+PADDING is the padding used when inserting key strings."
+  (insert (format (concat "%" (number-to-string padding) "s %-13s \t ")
                   (format "%s"
                           (propertize (substitute-command-keys
                                        (format "<\\[%s]>" (symbol-name command)))
