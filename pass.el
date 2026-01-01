@@ -60,6 +60,16 @@ Confirmation is suppressed for `pass-edit', `pass-kill' and `pass-quit'."
   :group 'pass
   :type 'boolean)
 
+(defcustom pass-otp-timeout 30
+  "Number of seconds before clearing OTP token from clipboard.
+This overrides `password-store-time-before-clipboard-restore' for
+OTP copy operations.  The default of 30 seconds matches the
+standard TOTP period defined in RFC 6238.
+If nil, uses the value of `password-store-time-before-clipboard-restore'."
+  :group 'pass
+  :type '(choice (integer :tag "Seconds")
+                 (const :tag "Use password-store default" nil)))
+
 (defvar pass-buffer-name "*Password-Store*"
   "Name of the pass buffer.")
 
@@ -494,6 +504,12 @@ indented according to INDENT-LEVEL."
           (forward-line -1)
           (pass-closest-entry)))))
 
+(defun pass--otp-copy-with-timeout (entry)
+  "Copy OTP token for ENTRY using `pass-otp-timeout'."
+  (let ((password-store-time-before-clipboard-restore
+         (or pass-otp-timeout password-store-time-before-clipboard-restore)))
+    (password-store-otp-token-copy entry)))
+
 (defun pass-otp-options (option)
   "Dispatch otp actions depending on user OPTION input.
 Display help message with OTP functionality options."
@@ -514,7 +530,7 @@ Display help message with OTP functionality options."
   "Add OTP Token from closest entry to kill ring."
   (interactive)
   (pass--with-closest-entry entry
-    (password-store-otp-token-copy entry)))
+    (pass--otp-copy-with-timeout entry)))
 
 (defun pass-otp-uri-copy ()
   "Add OTP URI from closest entry to kill ring."
@@ -635,7 +651,7 @@ This function only works when `pass-view-mode' is enabled."
   "Copy current `pass-view' buffer's OTP token into clipboard."
   (interactive)
   (when-let (entry-name (pass-view-entry-name))
-    (password-store-otp-token-copy entry-name)))
+    (pass--otp-copy-with-timeout entry-name)))
 
 (defun pass-view-qrcode ()
   "Open a new buffer that displays a QR Code for the current entry."
