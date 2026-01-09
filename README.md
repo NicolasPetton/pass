@@ -82,6 +82,20 @@ substitute the existing OTP key URI with a new one in each call. For more
 information, please refer to [`pass-otp`](https://github.com/tadfisher/pass-otp)
 documentation.
 
+##### `pass-otp-timeout`
+
+By default, OTP tokens are cleared from the clipboard after 30 seconds,
+matching the standard TOTP period defined in RFC 6238. You can customize
+this behavior:
+
+```elisp
+;; Clear OTP tokens after 45 seconds
+(setq pass-otp-timeout 45)
+
+;; Use the password-store.el default timeout
+(setq pass-otp-timeout nil)
+```
+
 #### Pass View Mode
 
 `pass` entry files are displayed in buffers that run under
@@ -91,6 +105,8 @@ documentation.
 - You can hit `C-c C-w` to copy your password to your clipbard.
 - In case of having OTP information in an entry, the buffer will display a
   header line with the OTP token and remaining seconds until expiration.
+  Note: The OTP token remains visible in the header line while viewing
+  the entry. Consider this when screen sharing or in untrusted environments.
 - You can hit `C-c C-o` to copy the OTP token to your clipboard.
 - You can hit `C-c C-q` to display the QR Code for the OTP URI in the entry.
 
