@@ -680,7 +680,8 @@ This function only works when `pass-view-mode' is enabled."
   "Display OTP TOKEN and REMAINING-SECS in Header Line."
   (let ((otp-data (concat (propertize " " 'display '((space :align-to 0)))
                           (propertize "OTP: " 'face 'pass-mode-header-face)
-                          token " - " remaining-secs "s remaining"))
+                          (string-trim token)
+                          " - " remaining-secs "s remaining"))
         (key-binding (concat (propertize (substitute-command-keys
                                           (format "<\\[%s]>" "pass-view-copy-token"))
                                          'face 'pass-mode-keybinding-face)
